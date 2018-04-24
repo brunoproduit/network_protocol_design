@@ -20,13 +20,10 @@ class Listener(multiprocessing.Process):
     def run(self):
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-<<<<<<< HEAD
+
         s.bind((self.address, self.port))
            
-=======
-        s.bind((INET_ADDR, self.port))
 
->>>>>>> b8651fdc5ad35656cf473e7ca84f37c7c7dde985
         # Receive loop
         while True:
             try:
@@ -79,15 +76,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-<<<<<<< HEAD
     listener = Listener('0.0.0.0', PORT)
     sender = Sender(args.host, PORT)
-    
-=======
-    listener = Listener(INET_ADDR, PORT)
-    sender = Sender(INET_ADDR, PORT)
 
->>>>>>> b8651fdc5ad35656cf473e7ca84f37c7c7dde985
     listener.start()
     sender.start()
 
