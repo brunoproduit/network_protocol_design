@@ -15,4 +15,8 @@ MAX_PDU_SIZE = 100                      # Maximum PDU for communication
 #Protocol -------------------------------------------------------------------------
 
 
-
+# Utils ---------------------------------------------------------------------------
+SETTINGSGILE = 'settings.json'
+MASTERKEYPATH = './keys/masterkey.pgp'
+SOURCEKEYPATH = './keys/sourcekey.pgp'
+ALLKEYSPATH = ''

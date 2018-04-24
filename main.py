@@ -16,23 +16,28 @@ class Listener(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         self.address = address
         self.port = port
-    
+
     def run(self):
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+<<<<<<< HEAD
         s.bind((self.address, self.port))
            
+=======
+        s.bind((INET_ADDR, self.port))
+
+>>>>>>> b8651fdc5ad35656cf473e7ca84f37c7c7dde985
         # Receive loop
         while True:
-            try: 
+            try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
                 print (data)
-               
+
             except :
                 print ('Terminating server ...')
                 break
-                
+
         s.close()
         print ('Closed the server socket')
         print ('Terminating ...')
@@ -44,12 +49,12 @@ class Sender(multiprocessing.Process):
         self.address = address
         self.address = address
         self.port = port
-        
-        
+
+
     def run(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect((self.address, self.port))
-        
+
         while True:
             message = b'hello world'
 
@@ -59,7 +64,11 @@ class Sender(multiprocessing.Process):
                 print ('Terminating server ...')
                 break
 
-# Main, Program entry, arg parsing    
+
+# class Router(multiprocessing.Process):
+#     def __init__(self, port)
+
+# Main, Program entry, arg parsing
 if __name__ == '__main__':
     parser = ArgumentParser(description=info())
     parser.add_argument('-H','--host', help='Server TCP port, '\
@@ -67,15 +76,20 @@ if __name__ == '__main__':
                         default=INET_ADDR)
     parser.add_argument('-p','--port', type=int, help='Server TCP port, '\
                         'defaults to %d' % PORT, default=PORT)
-    
+
     args = parser.parse_args()
 
+<<<<<<< HEAD
     listener = Listener('0.0.0.0', PORT)
     sender = Sender(args.host, PORT)
     
+=======
+    listener = Listener(INET_ADDR, PORT)
+    sender = Sender(INET_ADDR, PORT)
+
+>>>>>>> b8651fdc5ad35656cf473e7ca84f37c7c7dde985
     listener.start()
     sender.start()
-    
+
     listener.join()
     sender.join()
-    
