@@ -13,7 +13,8 @@ UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
 MAX_PDU_SIZE = 100                      # Maximum PDU for communication
 
 #Protocol -------------------------------------------------------------------------
-
+ROUTER_PORT = 9999
+TEST_MD5_SRC = 'a'*20
 
 # Utils ---------------------------------------------------------------------------
 SETTINGSGILE = 'settings.json'
