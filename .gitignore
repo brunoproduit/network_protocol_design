@@ -102,3 +102,4 @@ ENV/
 
 # Macfiles
 .DS_Store
+.idea/
