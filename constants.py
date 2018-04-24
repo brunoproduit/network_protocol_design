@@ -7,7 +7,7 @@ AUTHOR = 'Sander Mikelsaar, Sasan Reyaeifars, Florian Reiter, Bruno Produit, Pav
 VERSION = '0.1'                                                                               # Version of program
 
 # UDP -----------------------------------------------------------------------------
-PORT = 7777                             # Default UDP port, can be changed in arg
+PORT = 9999                             # Default UDP port, can be changed in arg
 INET_ADDR = '127.0.0.1'                 # Default IP, can be changed in arg
 UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
 MAX_PDU_SIZE = 100                      # Maximum PDU for communication

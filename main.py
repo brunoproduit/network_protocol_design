@@ -25,7 +25,9 @@ class Listener(multiprocessing.Process):
     def run(self):
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.bind((INET_ADDR, self.port))
+
+        s.bind((self.address, self.port))
+
 
         # Receive loop
         while True:
@@ -93,6 +95,9 @@ if __name__ == '__main__':
     router = RouterProcess(ROUTER_PORT, neighbors)
     router.start()
     router.join()
+
+    listener = Listener('0.0.0.0', PORT)
+    sender = Sender(args.host, PORT)
 
     # listener = Listener(INET_ADDR, PORT)
     # sender = Sender(INET_ADDR, PORT)
