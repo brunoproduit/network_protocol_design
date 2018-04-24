@@ -1,5 +1,6 @@
 import os, uuid, json
 from settings import PGPSettings
+from constants import *
 
 class Utils:
     def __init__(self):
@@ -38,7 +39,7 @@ class Utils:
     # dumps the settings into a json
     def saveSettings(self, settings):
         self.writeFile(
-            "settings.json",
+            SETTINGSGILE,
             ".",
             json.dumps(settings.__dict__).encode(),
             True
@@ -46,11 +47,11 @@ class Utils:
 
     # def readSettings(self, filename):
 
-
+    # router.neighbours[md5hash]
     # TODO: SendMessage, SaveSettings, SendUsermessage
 
 utils = Utils()
-pgpsettings = PGPSettings("keys/masterkey.pgp", "keys/masterkey.pgp")
+pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
 # utils.writeFile("test.txt", "..", b"Test!")
 print(utils.readFile("../test.txt"))
 utils.saveSettings(pgpsettings)

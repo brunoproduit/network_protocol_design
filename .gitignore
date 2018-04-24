@@ -103,3 +103,6 @@ ENV/
 # Macfiles
 .DS_Store
 .idea/
+
+# json
+settings.json

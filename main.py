@@ -59,6 +59,10 @@ class Sender(multiprocessing.Process):
                 print ('Terminating server ...')
                 break
 
+
+# class Router(multiprocessing.Process):
+#     def __init__(self, port)
+
 # Main, Program entry, arg parsing
 if __name__ == '__main__':
     parser = ArgumentParser(description=info())
