@@ -76,6 +76,8 @@ class RouterProcess(multiprocessing.Process):
     def run(self):
         router = Router(TEST_MD5_SRC, neighbors)
 
+        
+
 
 
 # Main, Program entry, arg parsing
@@ -90,7 +92,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # read in neighbors when you start the whole thing
-    neighbors = utils.setNeighbors()
+    neighbors = utils.getNeighbors()
 
     router = RouterProcess(ROUTER_PORT, neighbors)
     router.start()

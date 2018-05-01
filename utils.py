@@ -47,15 +47,15 @@ class Utils:
 
     # TODO: get settings from settingsfile --> then dont ask for new settings!
     # def readSettings(self, filename):
-    def setNeighbors(self):
-        print("Do something, get neighbours, arrr!")
-        inp = 'y'
+    def getNeighbors(self):
+        print("Do something, tell me your neighbours, arrr!")
+        addmore = 'y'
         neighbors = {}
         while inp.lower() == 'y':
-            ip = input('Tell me your neighbors IP: ')
-            mail = input('Tell me your neighbors email: ')
+            ip = input('Tell me your neighbor\'s IP: ') # TODO: do a check if it even is an IP!
+            mail = input('Tell me your neighbor\'s email: ') # TODO: cast to md5!
             neighbors[mail] = self.ip2int(ip)
-            inp = input('Add more neighbors? y/n ')
+            addmore = input('Add more neighbors? y/n ')
         print("neigbours given:", neighbors)
         return neighbors
 
@@ -74,4 +74,4 @@ class Utils:
 # # utils.writeFile("test.txt", "..", b"Test!")
 # print(utils.readFile("../test.txt"))
 # utils.saveSettings(pgpsettings)
-# utils.setNeighbors()
+# utils.getNeighbors()
