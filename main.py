@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from constants import *
+from utils import *
+from routing import *
+
 import socket
 import sys, os
 from argparse import ArgumentParser
@@ -9,6 +12,8 @@ import multiprocessing
 import logging
 
 def info(): return '%s by %s, version %s' % (NAME, AUTHOR, VERSION)
+
+utils = Utils()
 
 class Listener(multiprocessing.Process):
 
@@ -22,7 +27,7 @@ class Listener(multiprocessing.Process):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         s.bind((self.address, self.port))
-           
+
 
         # Receive loop
         while True:
@@ -57,13 +62,23 @@ class Sender(multiprocessing.Process):
 
             try:
                 s.sendall(message)
-            except :
+            except:
                 print ('Terminating server ...')
                 break
 
 
-# class Router(multiprocessing.Process):
-#     def __init__(self, port)
+class RouterProcess(multiprocessing.Process):
+    def __init__(self, port, neighbors):
+        multiprocessing.Process.__init__(self)
+        self.port = port
+        self.neighbors = neighbors
+
+    def run(self):
+        router = Router(TEST_MD5_SRC, neighbors)
+
+        
+
+
 
 # Main, Program entry, arg parsing
 if __name__ == '__main__':
@@ -76,11 +91,21 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # read in neighbors when you start the whole thing
+    neighbors = utils.getNeighbors()
+
+    router = RouterProcess(ROUTER_PORT, neighbors)
+    router.start()
+    router.join()
+
     listener = Listener('0.0.0.0', PORT)
     sender = Sender(args.host, PORT)
 
-    listener.start()
-    sender.start()
+    # listener = Listener(INET_ADDR, PORT)
+    # sender = Sender(INET_ADDR, PORT)
 
-    listener.join()
-    sender.join()
+    # listener.start()
+    # sender.start()
+    #
+    # listener.join()
+    # sender.join()
