@@ -21,12 +21,12 @@ class Router:
                 self.graph.insert_edge(sender, i[0], i[3])
         self.table = self.graph.bellman_ford()[0]
 
-    # Getter which converts md5hash to ipv4-address
+    # Returns the md5hash of the next hop
     def get_next_hop(md5hash):
-        # TODO
-        if md5hash in self.table:
-            return self.table[md5hash][1]
+        if md5hash in neighbors:
+            return md5hash
         else:
+            
             return None
 
 
@@ -80,4 +80,4 @@ class Graph:
 
 r = Router("test", [("w",0),("e",2),("q",1)])
 
-print (r.table, r.neighbors, r.graph)
+print (r.graph.bellman_ford(), r.neighbors)
