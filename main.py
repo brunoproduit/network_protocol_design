@@ -38,7 +38,7 @@ class Listener(multiprocessing.Process):
             try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
-                data = parse_l5(data)
+                data = Layer5.parse_l5(data)
                 data = data.payload
                 data = decrypt(data, sk)
                 print (data)
