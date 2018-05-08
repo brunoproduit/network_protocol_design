@@ -14,15 +14,18 @@ class Router:
 
 
     # Is called to update the routing table
+    # sender: tuple(md5hash, ipv4-address)
     # table: list of tuple(md5hash, ipv4-address, withdraw, distance)
     # returns None if the update would break the routing table.
-
     def update(self, sender, table):
+        if sender not in self.neighbors:
+            self.neighbors.append(sender)
+
         for i in table:
             if i[2]:
                 self.graph.remove_vertice(i[0])
             else:
-                self.graph.insert_edge(sender, i[0], i[3])
+                self.graph.insert_edge(sender[0], i[0], i[3] + 1)
 
         bf = self.graph.bellman_ford()
 
@@ -33,18 +36,20 @@ class Router:
         else:
             return None
 
+    # Takes the md5 hash of the destination
     # Returns ipv4 of the next node in the route to dest
-    # returns None if dest is not in the list of vertices
+    # Returns None if dest is not in the list of vertices
     def get_next_hop(self, dest_md5):
         if dest_md5 not in self.prev_hops:
             return None
 
-        # Traverses the prev_hops from bellman_ford backwards from dest to src, returns ipv4 from self.table
+        # Traverses the prev_hops from bellman_ford backwards from dest to src, returns ipv4 from self.neighbors
         prev_step = dest_md5
         while True:
             next_step = self.prev_hops[prev_step]
             if next_step == self.graph.src:
-                for row in self.table:
+                # Next hop should be a neighbor
+                for row in self.neighbors:
                     if row[0] == prev_step:
                         return row[1]
             prev_step = next_step
