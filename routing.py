@@ -15,7 +15,8 @@ class Router:
 
     # Is called to update the routing table
     # table: list of tuple(md5hash, ipv4-address, withdraw, distance)
-    # returns None
+    # returns None if the update would break the routing table.
+
     def update(self, sender, table):
         for i in table:
             if i[2]:
@@ -23,7 +24,14 @@ class Router:
             else:
                 self.graph.insert_edge(sender, i[0], i[3])
 
-        self.table = self.graph.bellman_ford()[0]
+        bf = self.graph.bellman_ford()
+
+        # Check if update would break the graph
+        if bf != 0:
+            self.table = bf[0]
+            self.prev_hops = bf[1]
+        else:
+            return None
 
     # Returns ipv4 of the next node in the route to dest
     # returns None if dest is not in the list of vertices
