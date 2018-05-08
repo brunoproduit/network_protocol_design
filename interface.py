@@ -8,8 +8,8 @@ class UserInterface:
 	# def __init__(self):
     #     self.version = 0
 
-    def startupRoutine:
-        print("Welcome to our uber-cool implementation of the NPD Protocol")
+    def startupRoutine(self):
+        print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
 
     def mainLoop(self):
         commandInput = input('Give me a command:')
