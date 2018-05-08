@@ -38,8 +38,7 @@ class Listener(multiprocessing.Process):
             try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
-                data = Layer5.parse_l5(Layer4.parse_l4(data))
-                data = data.payload
+                data = Layer5.parse_l5(data).payload
                 data = decrypt(data, sk)
                 print (data)
 
@@ -67,7 +66,7 @@ class Sender(multiprocessing.Process):
         while True:
             message = "Hello World!"
             message = encrypt(message, pk).encode()
-            message = bytes(Layer4(message, True, False))
+            message = bytes(Layer5(message))
             
             try:
                 s.sendall(message)
