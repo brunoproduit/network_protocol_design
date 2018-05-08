@@ -1,24 +1,19 @@
 #!/usr/bin/python3
-from enum import Enum
-
-class Layer5Type(Enum):
-    MESSAGE = b'\x01',
-    FILE = b'\x02',
-    HASH = b'\x04'
+from constants import *
 
 class Layer5:
 
     # Constructor
     # @param: data bytes
     # @param: packet_type Layer5Type, defaults to MESSAGE
-    def __init__(self, data, packet_type=Layer5Type.MESSAGE):
+    def __init__(self, data, packet_type=L5_MESSAGE):
         self.type = packet_type
         self.payload = data
     
     # Serializing the packet to be called as bytes(l5p)
     # @return: packet bytes
     def __bytes__(self):
-        return self.type.value[0] + self.payload
+        return self.type + self.payload
     
     # Parses a serialized l5 packet
     # @static

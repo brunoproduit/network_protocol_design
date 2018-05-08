@@ -1,12 +1,6 @@
 #!/usr/bin/python3
-from enum import Enum
+from constants import *
 from layer5 import *
-
-class Layer4Type(Enum):
-    ROUTINGFULL = 1,
-    DATA = 2,
-    CHUNKED = 4,
-    ENCRYPTED = 8
 
 class Layer4:
 
@@ -15,16 +9,16 @@ class Layer4:
     # @param encrypted boolean
     # @param chunked boolean
     # @param: packet_type Layer4Type, defaults to DATA
-    def __init__(self, data, encrypted, chunked, packet_type=Layer4Type.DATA.value[0]):
+    def __init__(self, data, encrypted, chunked, packet_type=L4_DATA):
         self.type = packet_type
         
         if encrypted:
-            self.type = self.type ^ Layer4Type.ENCRYPTED.value
+            self.type = self.type ^ L4_ENCRYPTED
         
         if chunked:
-            self.type = self.type ^ Layer4Type.CHUNKED.value
+            self.type = self.type ^ L4_CHUNKED
             
-        self.payload = Layer5(data)
+        self.payload = data
     
     # Serializing the packet to be called as bytes(l4p)
     # @return: packet bytes

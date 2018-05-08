@@ -33,3 +33,18 @@ QUIT_COMMAND = "quit"
 HELP_COMMAND = "help"
 HELP_TEXT = "The follwoing commands are valid:\n @mail[:file] Message with spaces.\n @all@mail[:file] Message with spaces to everyone.\n help Display help. \n quit Exit the program"
 UNKNOWN_COMMAND = "unknown"
+
+# L5 ------------------------------------------------------------------------
+L5_MESSAGE = b'\x01'
+L5_FILE = b'\x02'
+L5_HASH = b'\x04'
+
+# L4 ------------------------------------------------------------------------
+L4_ROUTINGFULL = 1
+L4_DATA = 2
+L4_CHUNKED = 4
+L4_ENCRYPTED = 8
+
+# L3 ------------------------------------------------------------------------
+DATA = 0x02
+CONFIRMATION = 0x04
