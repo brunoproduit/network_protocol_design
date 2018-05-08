@@ -37,7 +37,7 @@ def create_pgp_message_from_file(filename):
 # Encrypt string
 # @param: m string
 # @param: pk PGPkey.pubkey
-# @return: pgp_m PGPMessage
+# @return: pgp_m string
 def encrypt(m, pk):
     return str(pk.encrypt(create_pgp_message(m)))
 

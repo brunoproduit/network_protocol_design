@@ -5,6 +5,8 @@ from constants import *
 #from utils import *
 from routing import *
 from crypto import *
+from layer5 import *
+
 
 import socket
 import sys, os
@@ -36,12 +38,13 @@ class Listener(multiprocessing.Process):
             try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
+                data = parse_l5(data)
+                data = data.payload
                 data = decrypt(data, sk)
-                
                 print (data)
 
-            except :
-                print ('Terminating server ...')
+            except Exception as e:
+                print (e, 'Terminating server ...')
                 break
 
         s.close()
@@ -64,11 +67,12 @@ class Sender(multiprocessing.Process):
         while True:
             message = "Hello World!"
             message = encrypt(message, pk).encode()
+            message = bytes(Layer5(message))
             
             try:
                 s.sendall(message)
-            except:
-                print ('Terminating server ...')
+            except Exception as e:
+                print (e, 'Terminating server ...')
                 break
 
 
