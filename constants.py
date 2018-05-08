@@ -21,3 +21,15 @@ SETTINGSGILE = 'settings.json'
 MASTERKEYPATH = './keys/masterkey.pgp'
 SOURCEKEYPATH = './keys/sourcekey.pgp'
 ALLKEYSPATH = ''
+
+# Commands ------------------------------------------------------------------------
+ADD_NEIGHBOR_COMMAND = "+"
+REMOVE_NEIGHBOR_COMMAND = "-"
+BROADCAST_MAIL = "@all"
+DETAIL_SEPERATOR = ":"
+SEND_FILE_COMMAND = "file"
+SEND_MESSAGE_COMMAND = "message"
+QUIT_COMMAND = "quit"
+HELP_COMMAND = "help"
+HELP_TEXT = "The follwoing commands are valid:\n @mail[:file] Message with spaces.\n @all@mail[:file] Message with spaces to everyone.\n help Display help. \n quit Exit the program"
+UNKNOWN_COMMAND = "unknown"
