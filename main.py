@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from constants import *
-from utils import *
+#from utils import *
 from routing import *
+from crypto import *
+from layer5 import *
+
 
 import socket
 import sys, os
@@ -13,7 +16,8 @@ import logging
 
 def info(): return '%s by %s, version %s' % (NAME, AUTHOR, VERSION)
 
-utils = Utils()
+# utils = Utils()
+sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
 
 class Listener(multiprocessing.Process):
 
@@ -34,10 +38,13 @@ class Listener(multiprocessing.Process):
             try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
+                data = Layer5.parse_l5(data)
+                data = data.payload
+                data = decrypt(data, sk)
                 print (data)
 
-            except :
-                print ('Terminating server ...')
+            except Exception as e:
+                print (e, 'Terminating server ...')
                 break
 
         s.close()
@@ -58,12 +65,14 @@ class Sender(multiprocessing.Process):
         s.connect((self.address, self.port))
 
         while True:
-            message = b'hello world'
-
+            message = "Hello World!"
+            message = encrypt(message, pk).encode()
+            message = bytes(Layer5(message))
+            
             try:
                 s.sendall(message)
-            except:
-                print ('Terminating server ...')
+            except Exception as e:
+                print (e, 'Terminating server ...')
                 break
 
 
@@ -76,7 +85,7 @@ class RouterProcess(multiprocessing.Process):
     def run(self):
         router = Router(TEST_MD5_SRC, neighbors)
 
-
+        
 
 
 
@@ -92,20 +101,17 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # read in neighbors when you start the whole thing
-    neighbors = utils.getNeighbors() # maybe we wanna change the thing to just add neighbors?
+    #neighbors = utils.getNeighbors()
 
-    router = RouterProcess(ROUTER_PORT, neighbors)
-    router.start()
-    router.join()
+    #router = RouterProcess(ROUTER_PORT, neighbors)
+    #router.start()
+    #router.join()
 
     listener = Listener('0.0.0.0', PORT)
     sender = Sender(args.host, PORT)
 
-    # listener = Listener(INET_ADDR, PORT)
-    # sender = Sender(INET_ADDR, PORT)
-
-    # listener.start()
-    # sender.start()
-    #
-    # listener.join()
-    # sender.join()
+    listener.start()
+    sender.start()
+    
+    listener.join()
+    sender.join()
