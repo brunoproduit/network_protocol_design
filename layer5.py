@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 from constants import *
 
-class Layer5:
 
+class Layer5:
     # Constructor
     # @param: data bytes
     # @param: packet_type Layer5Type, defaults to MESSAGE
@@ -19,8 +19,6 @@ class Layer5:
     # @static
     # @param: packet string
     # @return: l5p Layer5
+    @staticmethod
     def parse_l5(packet):
         return Layer5(packet[1:], packet[0])
-        
-
-        

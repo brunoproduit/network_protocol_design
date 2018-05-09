@@ -1,9 +1,8 @@
 #!/usr/bin/python3
-from constants import *
 from layer5 import *
 
-class Layer4:
 
+class Layer4:
     # Constructor
     # @param: data bytes
     # @param encrypted boolean
@@ -29,6 +28,7 @@ class Layer4:
     # @static
     # @param: packet string
     # @return: l5p Layer4
+    @staticmethod
     def parse_l4(packet):
         return Layer4(packet[1:], True, False, packet[0])
 

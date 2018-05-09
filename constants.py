@@ -46,5 +46,5 @@ L4_CHUNKED = 4
 L4_ENCRYPTED = 8
 
 # L3 ------------------------------------------------------------------------
-DATA = 0x02
-CONFIRMATION = 0x04
+L3_DATA = 0x02
+L3_CONFIRMATION = 0x04
