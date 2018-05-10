@@ -10,10 +10,15 @@ from constants import *
 from settings import *
 from routingprocesses import *
 
+dev = True
+
 class UserInterface:
     def __init__(self):
         self.pgpsettings = {}
-        self.neighbors = {'4db526c3294f17820fd0682d9dceaeb4': 2130706433}
+        if dev:
+            self.neighbors = {'4db526c3294f17820fd0682d9dceaeb4': 2130706433}
+        else:
+            self.neighbors = {}
         self.routinglistener = RoutingListener('0.0.0.0', ROUTER_PORT)
 
     def enable_history(self):
@@ -41,7 +46,8 @@ class UserInterface:
             utils.save_settings(self.pgpsettings)
 
         self.display_seperator()
-        # self.enter_neighbors()
+        if not dev:
+            self.enter_neighbors()
         self.display_seperator()
 
         self.listen_to_neighbors()
