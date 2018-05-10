@@ -7,7 +7,7 @@ AUTHOR = 'Sander Mikelsaar, Sasan Reyaeifars, Florian Reiter, Bruno Produit, Pav
 VERSION = '0.1'                                                                               # Version of program
 
 # UDP -----------------------------------------------------------------------------
-PORT = 9999                             # Default UDP port, can be changed in arg
+PORT = 6666                             # Default UDP port, can be changed in arg
 INET_ADDR = '127.0.0.1'                 # Default IP, can be changed in arg
 UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
 MAX_PDU_SIZE = 100                      # Maximum PDU for communication
@@ -33,8 +33,9 @@ SEND_FILE_COMMAND = "file"
 SEND_MESSAGE_COMMAND = "message"
 QUIT_COMMAND = "quit"
 HELP_COMMAND = "help"
-HELP_TEXT = "The follwoing commands are valid:\n @mail[:file] Message with spaces.\n @all@mail[:file] Message with spaces to everyone.\n help Display help. \n quit Exit the program"
+HELP_TEXT = "The follwoing commands are valid:\n @mail[:file] Message with spaces.\n @all[:file] Message with spaces to everyone.\n help Display help. \n quit Exit the program"
 UNKNOWN_COMMAND = "unknown"
+INVALID_COMMAND = "invalid"
 
 # L5 ------------------------------------------------------------------------
 L5_MESSAGE = b'\x01'
