@@ -10,12 +10,10 @@ from constants import *
 from settings import *
 from routingprocesses import *
 
-dev = True
-
 class UserInterface:
     def __init__(self):
         self.pgpsettings = {}
-        if dev:
+        if DEVELOPMENT:
             self.neighbors = {'4db526c3294f17820fd0682d9dceaeb4': 2130706433}
         else:
             self.neighbors = {}
@@ -46,7 +44,7 @@ class UserInterface:
             utils.save_settings(self.pgpsettings)
 
         self.display_seperator()
-        if not dev:
+        if not DEVELOPMENT:
             self.enter_neighbors()
         self.display_seperator()
 
