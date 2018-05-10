@@ -17,9 +17,11 @@ ROUTER_PORT = 9999
 TEST_MD5_SRC = 'a'*20
 
 # Utils ---------------------------------------------------------------------------
-SETTINGSGILE = 'settings.json'
+SETTINGSFILE = 'settings.ini'
 MASTERKEYPATH = './keys/masterkey.pgp'
 SOURCEKEYPATH = './keys/sourcekey.pgp'
+MASTER_KEY_NAME = 'master_key'
+SELF_KEY_NAME = 'own_node_key'
 ALLKEYSPATH = ''
 
 # Commands ------------------------------------------------------------------------

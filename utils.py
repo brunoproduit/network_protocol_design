@@ -1,5 +1,5 @@
 import os, uuid, json, ipaddress, struct, socket
-from settings import PGPSettings
+from settings import *
 from constants import *
 
 class Utils:
@@ -7,11 +7,11 @@ class Utils:
         self.data = []
 
     # Helper function to read a file returns a binary string
-    # @param:filefilename string
+    # @param:filename string
     # @return: binary string
-    def readFile(self, filefilename):
-         if os.path.exists(filefilename):
-             f = open(filefilename, 'rb')
+    def readFile(self, filename):
+         if os.path.exists(filename):
+             f = open(filename, 'rb')
              data = f.read()
              f.close()
              return data
@@ -22,6 +22,7 @@ class Utils:
     # @param:filename string
     # @param:directory string
     # @param:data binary string
+    # @param:overwrite boolean
     def writeFile(self, filename, directory, data, overwrite = False):
         if os.path.exists(directory+ "/" + filename) and not overwrite:
             print('File already exist, choosing random name...')
@@ -38,10 +39,15 @@ class Utils:
 
     # dumps the settings into a json
     def saveSettings(self, settings):
+        settingsContent = ""
+        for setting in settings:
+            settingsContent += setting + "=" + settings[setting].keypath + "\n"
+
+        # json.dumps(settings.__dict__).encode(),
         self.writeFile(
-            SETTINGSGILE,
+            SETTINGSFILE,
             ".",
-            json.dumps(settings.__dict__).encode(),
+            settingsContent.encode(),
             True
         )
 

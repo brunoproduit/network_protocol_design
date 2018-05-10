@@ -1,21 +1,54 @@
 import hashlib
 import re
 import os
+import sys
 from utils import *
 from constants import *
+from settings import *
 
 class UserInterface:
-	# def __init__(self):
-    #     self.version = 0
+    def __init__(self):
+        self.pgpsettings = {}
 
     def startupRoutine(self):
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
+        # check if a settings.json is present otherwise read masterfile and own key
+
+        if not self.readPGPKeySettings():
+            self.enterPGPKey(MASTER_KEY_NAME)
+            self.enterPGPKey(SELF_KEY_NAME)
+            Utils().saveSettings(self.pgpsettings)
+
+    def readPGPKeySettings(self):
+        if not os.path.exists(SETTINGSFILE) or input("Do you want to overwrite existing settings? (y/n) ").lower() == "y":
+            return False
+        else:
+            print("Reading from settings file...")
+            with open(SETTINGSFILE, 'rb') as f:
+               for line in f:
+                   kvpair = line[:-1].decode('utf8').split('=', 1)
+                   self.addPGPKeyToSettings(kvpair[1], kvpair[0])
+            return True
+
+
+    def enterPGPKey(self, keyname):
+        filename = input("Insert path for the " + keyname + ": ")
+        self.addPGPKeyToSettings(filename, keyname)
+
+    def addPGPKeyToSettings(self, filename, keyname):
+        if not os.path.exists(filename):
+            print (keyname + ": '" + filename + "', can't work without provided key.")
+            sys.exit(1)
+        else:
+            keyfile = open(filename, 'rb')
+            self.pgpsettings[keyname] = PGPSetting(os.path.abspath(keyfile.name), keyfile.read())
+            print("Adding '" + keyname + "' with value '" + os.path.abspath(keyfile.name) + "'")
+            keyfile.close()
 
     def mainLoop(self):
-        commandInput = input('Give me a command:')
-        commandType = self.commandRecogination(commandInput)
+        commandType = 'empty'
         while commandType != QUIT_COMMAND:
-            commandInput = input('Give me a command:')
+            commandInput = input('Give me a command: ')
             commandType = self.commandRecogination(commandInput) # command pattern should probably be used instead of this rubish implementation :D
             print(commandType)
             if commandType == HELP_COMMAND:
