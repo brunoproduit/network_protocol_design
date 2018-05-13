@@ -1,8 +1,8 @@
 import json
 
-class PGPSettings(json.JSONEncoder):
+class PGPSetting(json.JSONEncoder):
 
     # Constructor
-    def __init__(self, masterkeypath, sourcekeypath):
-        self.masterkeypath = masterkeypath
-        self.sourcekeypath = sourcekeypath
+    def __init__(self, keypath, keydata):
+        self.keypath = keypath
+        self.keydata = keydata

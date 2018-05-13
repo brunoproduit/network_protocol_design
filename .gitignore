@@ -104,5 +104,5 @@ ENV/
 .DS_Store
 .idea/
 
-# json
-settings.json
+# ini
+settings.ini

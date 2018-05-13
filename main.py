@@ -55,7 +55,6 @@ class Sender(multiprocessing.Process):
     def __init__(self, address, port):
         multiprocessing.Process.__init__(self)
         self.address = address
-        self.address = address
         self.port = port
 
 
@@ -67,7 +66,7 @@ class Sender(multiprocessing.Process):
             message = "Hello World!"
             message = encrypt(message, pk).encode()
             message = bytes(Layer5(message))
-            
+
             try:
                 s.sendall(message)
             except Exception as e:
@@ -84,7 +83,7 @@ class RouterProcess(multiprocessing.Process):
     def run(self):
         router = Router(TEST_MD5_SRC, neighbors)
 
-        
+
 
 
 
@@ -99,9 +98,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # read in neighbors when you start the whole thing
-    #neighbors = utils.getNeighbors()
-
     #router = RouterProcess(ROUTER_PORT, neighbors)
     #router.start()
     #router.join()
@@ -111,6 +107,6 @@ if __name__ == '__main__':
 
     listener.start()
     sender.start()
-    
+
     listener.join()
     sender.join()
