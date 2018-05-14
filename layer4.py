@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from constants import *
 from layer5 import Layer5
+from routing_table import RoutingTable
 from utils import Utils
 
 
@@ -26,12 +27,12 @@ class Layer4:
                 chr(self.status) + 
                 Utils.int_to_bytestring(self.stream_id, 3) + 
                 Utils.int_to_bytestring(self.chunk_id, 8) + 
-                (self.payload.__bytes__()).decode()
+                (bytes(self.payload)).decode()
             ).encode()
         elif self.type & L4_ROUTINGFULL:
             return (
                 chr(self.type) + 
-                (self.payload.__bytes__()).decode()
+                (bytes(self.payload)).decode()
             ).encode()
         else:
             raise ValueError('Layer 4 unsupported packet!')
@@ -40,8 +41,8 @@ class Layer4:
     def parse_l4(packet):
         if packet[0] & L4_DATA:
             return Layer4(
-                data=Layer5.parse_l5((packet[13:]).decode()), 
                 packet_type=L4_DATA,
+                data=Layer5.parse_l5((packet[13:]).decode()), 
                 encrypted=packet[0] & L4_ENCRYPTED, 
                 chunked=packet[0] & L4_CHUNKED, 
                 status=packet[1],
@@ -49,5 +50,7 @@ class Layer4:
                 chunk_id=Utils.bytes_to_int(packet[5:13]),
             )
         elif packet[0] & L4_ROUTINGFULL:
-            raise ValueError('Layer 4 Routing packet not supported!')
-
+            return Layer4(
+                packet_type=L4_ROUTINGFULL,
+                data=RoutingTable.parse(packet[1:])
+            )
