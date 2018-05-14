@@ -61,6 +61,7 @@ class Sender(multiprocessing.Process):
         self.address = address
         self.port = port
 
+
     def run(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect((self.address, self.port))
@@ -68,7 +69,7 @@ class Sender(multiprocessing.Process):
         while True:
             data = "Eat some rotten shtrudel!"
             message = bytes(Layer3(
-                Layer4Data(Layer5(encrypt(data, pk).encode()), True, True, 1, 2, 3), 
+                Layer4(Layer5(encrypt(data, pk).encode()), L4_DATA, True, True, 1, 2, 3), 
                 b'aaaaaaaaaaaaaaaa', 
                 b'dddddddddddddddd', 
                 7, 
@@ -95,7 +96,7 @@ class RouterProcess(multiprocessing.Process):
 if __name__ == '__main__':
     parser = ArgumentParser(description=info())
     parser.add_argument('-H', '--host', help='Server TCP port, '
-                        'defaults to %s' % INET_ADDR,
+                        'defaults to %s' % INET_ADDR, 
                         default=INET_ADDR)
     parser.add_argument('-p', '--port', type=int, help='Server TCP port, '
                         'defaults to %d' % PORT, default=PORT)

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from constants import *
-from layer4 import *
-from utils import *
+from layer4 import Layer4
+from utils import Utils
 
 
 class Layer3:
@@ -31,13 +31,18 @@ class Layer3:
     def parse_l3(packet):
         if packet[3] == L3_DATA:
             return Layer3(
-                Layer4Data.parse_l4data(packet[40:]), 
-                Utils.bytes_to_int(packet[8:24]),  # Source
-                Utils.bytes_to_int(packet[24:40]), # Destination
-                Utils.bytes_to_int(packet[1:2]),   # Packet number
-                packet[4],
-                L3_DATA,
-                Utils.bytes_to_int(packet[5:6]),   # Confirmation ID
-                )
+                packet_type=L3_DATA,
+                source=Utils.bytes_to_int(packet[8:24]),
+                destination=Utils.bytes_to_int(packet[24:40]),
+                ttl=packet[4],
+                packet=Utils.bytes_to_int(packet[1:2]),
+                data=Layer4.parse_l4(packet[40:]), 
+            )
         elif packet[3] == L3_CONFIRMATION:
-            raise ValueError('Layer 3 ACK packet not supported!')
+             return Layer3(
+                 packet_type=L3_CONFIRMATION,
+                 source=Utils.bytes_to_int(packet[8:24]),
+                 destination=Utils.bytes_to_int(packet[24:40]),
+                 ttl=packet[4],
+                 confirmation=Utils.bytes_to_int(packet[5:6])
+             )

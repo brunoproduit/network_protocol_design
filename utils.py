@@ -71,6 +71,7 @@ class Utils:
         except:
             return False
 
+    @staticmethod
     def int_to_bytestring(i, length):
         s = ""
         for _ in range(length):
@@ -78,6 +79,7 @@ class Utils:
             i >>= 8
         return s
 
+    @staticmethod
     def bytes_to_int(bytes):
         result = 0
         for byte in bytes:
