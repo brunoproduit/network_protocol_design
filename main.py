@@ -5,6 +5,7 @@ from constants import *
 #from utils import *
 from routing import *
 from crypto import *
+from layer3 import *
 from layer4 import *
 from layer5 import *
 
@@ -38,7 +39,7 @@ class Listener(multiprocessing.Process):
             try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
-                data = Layer5.parse_l5(data).payload
+                data = Layer3.parse_l3(data).payload.payload.payload
                 data = decrypt(data, sk)
                 print (data)
 
@@ -63,9 +64,13 @@ class Sender(multiprocessing.Process):
         s.connect((self.address, self.port))
 
         while True:
-            message = "Hello World!"
-            message = encrypt(message, pk).encode()
-            message = bytes(Layer5(message))
+            data = "Eat some rotten shtrudel!"
+            message = bytes(Layer3(
+                Layer4Data(Layer5(encrypt(data, pk).encode()), True, True, 1, 2, 3), 
+                b'aaaaaaaaaaaaaaaa', 
+                b'dddddddddddddddd', 
+                7, 
+                packet_type=L3_DATA))
 
             try:
                 s.sendall(message)
@@ -86,13 +91,7 @@ class RouterProcess(multiprocessing.Process):
 
 # Main, Program entry, arg parsing
 if __name__ == '__main__':
-    message = "Eat some rotten shtrudel, fag"
-    print("Encoding message: " + message)
-    l4 = Layer4Data(Layer5(encrypt(message, pk).encode()), True, True, 1, 2, 3)
-    newl4 = Layer4Data.parse_l4data(l4.__bytes__())
-    print("Decoded message:  " + decrypt(newl4.payload.payload, sk))
-
-    '''parser = ArgumentParser(description=info())
+    parser = ArgumentParser(description=info())
     parser.add_argument('-H','--host', help='Server TCP port, '\
                         'defaults to %s' % INET_ADDR, \
                         default=INET_ADDR)
@@ -112,4 +111,4 @@ if __name__ == '__main__':
     sender.start()
 
     listener.join()
-    sender.join()'''
+    sender.join()
