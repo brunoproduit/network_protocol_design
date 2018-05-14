@@ -136,6 +136,25 @@ class UserInterface:
     def send_message(self, address, message):
         address = utils.address_to_md5(address)
         print("Preparing packet for message #X, sending out to address: " + address + ", message is: " + message)
+        
+        # Where is our pk?
+        ciphertext = encrypt(message, pk).encode()
+        
+        # You need to tell me what you did with routing
+        # We need router.py 
+        ip = get_next_hop(address)
+        
+        # When do we chunk? is this giving us already l3 chunks or
+        # should we chunk in this method?
+        chunks = bytes(Layer3(ciphertext))
+        
+        # Sending
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((ip, PORT))      
+        
+        for i in chunks:
+            s.sendall(i)
+            
 
     def forward_packet(self, l5packet):
         print("Fowarding Layer 5 packet")
