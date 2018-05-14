@@ -33,8 +33,8 @@ INVALID_COMMAND = "invalid"
 ```
 
 An example of the setup process and the `help` command can be seen here:
-![UI setup](network_protocol_design/ui.PNG)
+![UI](https://github.com/brunoproduit/network_protocol_design/blob/master/ui.PNG)
 
 If the user has previously done the setup process, they can choose to overwrite the settings defined in the previous setup:
-![settings_overwrite](network_protocol_design/overwrite.PNG)
+![overwrite](https://github.com/brunoproduit/network_protocol_design/blob/master/overwrite.PNG)
 
