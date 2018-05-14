@@ -50,7 +50,9 @@ class UserInterface:
 
         self.listen_to_neighbors()
         self.send_to_neighbors()
-
+    
+    # Message other than routing should also be done with processes, 
+    # as we could receive messages anytime - Bruno
     def main_loop(self):
         commandType = 'empty'
         while commandType != QUIT_COMMAND:
@@ -60,6 +62,8 @@ class UserInterface:
             if commandType == HELP_COMMAND:
                 self.display_help()
         self.routinglistener.join()
+        # Cannot do this after join, and wouldn't work either way, the loop should be done here
+        # and call the process - Bruno 
         self.routinglistener.quit = True
         print("cya next time!!")
 
@@ -137,15 +141,15 @@ class UserInterface:
         address = utils.address_to_md5(address)
         print("Preparing packet for message #X, sending out to address: " + address + ", message is: " + message)
         
-        # Where is our pk?
+        # Where is our pk? - Bruno
         ciphertext = encrypt(message, pk).encode()
         
         # You need to tell me what you did with routing
-        # We need router.py 
+        # We need router.py - Bruno
         ip = get_next_hop(address)
         
         # When do we chunk? is this giving us already l3 chunks or
-        # should we chunk in this method?
+        # should we chunk in this method? - Bruno
         chunks = bytes(Layer3(ciphertext))
         
         # Sending
