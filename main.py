@@ -84,12 +84,15 @@ class RouterProcess(multiprocessing.Process):
         router = Router(TEST_MD5_SRC, neighbors)
 
 
-
-
-
 # Main, Program entry, arg parsing
 if __name__ == '__main__':
-    parser = ArgumentParser(description=info())
+    message = "Eat some rotten shtrudel, fag"
+    print("Encoding message: " + message)
+    l4 = Layer4Data(Layer5(encrypt(message, pk).encode()), True, True, 1, 2, 3)
+    newl4 = Layer4Data.parse_l4data(l4.__bytes__())
+    print("Decoded message:  " + decrypt(newl4.payload.payload, sk))
+
+    '''parser = ArgumentParser(description=info())
     parser.add_argument('-H','--host', help='Server TCP port, '\
                         'defaults to %s' % INET_ADDR, \
                         default=INET_ADDR)
@@ -109,4 +112,4 @@ if __name__ == '__main__':
     sender.start()
 
     listener.join()
-    sender.join()
+    sender.join()'''

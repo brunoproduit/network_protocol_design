@@ -71,6 +71,20 @@ class Utils:
         except:
             return False
 
+    def int_to_bytestring(i, length):
+        s = ""
+        for _ in range(length):
+            s = chr(i & 0xff) + s
+            i >>= 8
+        return s
+
+    def bytes_to_int(bytes):
+        result = 0
+        for byte in bytes:
+            result += result * 256 + int(byte)
+        return result
+
+
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
 # # utils.write_file("test.txt", "..", b"Test!")

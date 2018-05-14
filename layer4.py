@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from struct import *
 from layer5 import *
+from utils import *
 
 
 class Layer4:
@@ -38,6 +38,7 @@ class Layer4:
         else:
             raise ValueError('Layer 4 packet of unknown type!')
 
+
 class Layer4Data:
     def __init__(self, data, encrypted, chunked, status, stream_id, chunk_id):
         self.type = L4_DATA
@@ -57,19 +58,19 @@ class Layer4Data:
         return (
             chr(self.type) + 
             chr(self.status) + 
-            str(bytes([self.stream_id])[0:3]) + 
-            str(bytes([self.chunk_id])[0:8]) + 
-            str(bytes(self.payload))).encode()
+            Utils.int_to_bytestring(self.stream_id, 3) + 
+            Utils.int_to_bytestring(self.chunk_id, 8) + 
+            (self.payload.__bytes__()).decode()).encode()
     
     @staticmethod
     def parse_l4data(packet):
         return Layer4Data(
-            packet[13:], 
+            Layer5.parse_l5((packet[13:]).decode()), 
             packet[0] & L4_ENCRYPTED, 
             packet[0] & L4_CHUNKED, 
-            packet[1],     # Status
-            packet[2:5],   # Stream ID
-            packet[5:13],  # Chunk ID
+            packet[1],                         # Status
+            Utils.bytes_to_int(packet[2:5]),   # Stream ID
+            Utils.bytes_to_int(packet[5:13]),  # Chunk ID
             )
 
 
