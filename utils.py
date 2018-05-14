@@ -57,13 +57,13 @@ class Utils:
     def valid_mail(self, address):
         return re.match(r"[^@]+@[^@]+\.[^@]+", address)
 
-    def address_to_md5(self, address):
+    def address_to_md5(address):
         if address != BROADCAST_MAIL:
             m = hashlib.md5()
             m.update(str.encode(address))
             return m.hexdigest()
         else:
-            return 32 * '0'
+            return 16 * '0'
 
     def valid_ip(self, address):
         try:
@@ -83,6 +83,15 @@ class Utils:
         for byte in bytes:
             result += result * 256 + int(byte)
         return result
+
+    def to_hexstring(hex):
+        string = ''
+        hex[0] + hex[1]
+        i = 2
+        while i < len(hex):
+            string = string + '\x' + hex[i] + hex[i+1]
+            i+=2
+        return string
 
 
 # utils = Utils()

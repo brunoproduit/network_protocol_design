@@ -17,21 +17,21 @@ class Layer3:
 
     def __bytes__(self):
         return (
-            chr(self.version) + 
-            Utils.int_to_bytestring(self.packet_number, 2) + 
-            chr(self.type) + 
+            chr(self.version) +
+            Utils.int_to_bytestring(self.packet_number, 2) +
+            chr(self.type) +
             chr(self.ttl) +
-            Utils.int_to_bytestring(self.confirmation_id, 2) + 
-            chr(0) + 
-            self.source.decode() +
-            self.destination.decode() + 
+            Utils.int_to_bytestring(self.confirmation_id, 2) +
+            chr(0) +
+            self.source.encode() +
+            self.destination.encode() +
             (self.payload.__bytes__()).decode()).encode()
 
     @staticmethod
     def parse_l3(packet):
         if packet[3] == L3_DATA:
             return Layer3(
-                Layer4Data.parse_l4data(packet[40:]), 
+                Layer4Data.parse_l4data(packet[40:]),
                 Utils.bytes_to_int(packet[8:24]),  # Source
                 Utils.bytes_to_int(packet[24:40]), # Destination
                 Utils.bytes_to_int(packet[1:2]),   # Packet number

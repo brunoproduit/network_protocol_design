@@ -9,6 +9,15 @@ from utils import *
 from constants import *
 from settings import *
 from routingprocesses import *
+from constants import *
+from routing import *
+from crypto import *
+from layer3 import *
+from layer4 import *
+from layer5 import *
+
+#TODO: ACK Packet / Packet Factory
+#TODO find out how to get the nexthop from routing :)
 
 class UserInterface:
     def __init__(self):
@@ -18,6 +27,7 @@ class UserInterface:
         else:
             self.neighbors = {}
         self.routinglistener = RoutingListener('0.0.0.0', ROUTER_PORT)
+        self.messagelistener = RoutingListener('0.0.0.0', PORT)
 
     def enable_history(self):
         # tab completion
@@ -28,7 +38,6 @@ class UserInterface:
             readline.read_history_file(histfile)
         except IOError:
             pass
-
 
     def cleanup_history_vars(self):
         atexit.register(readline.write_history_file, histfile)
@@ -48,8 +57,8 @@ class UserInterface:
             self.enter_neighbors()
         self.display_seperator()
 
-        self.listen_to_neighbors()
-        self.send_to_neighbors()
+        self.routinglistener.start() # router is listening now
+        self.messagelistener.start() # also messages will be displayed now!
 
     def main_loop(self):
         commandType = 'empty'
@@ -62,7 +71,6 @@ class UserInterface:
         self.routinglistener.join()
         self.routinglistener.quit = True
         print("cya next time!!")
-
 
     def read_pgpkey_settings_file(self):
         if not os.path.exists(SETTINGSFILE) or input("Do you want to overwrite existing settings? (y/n) ").lower() == "y":
@@ -103,7 +111,7 @@ class UserInterface:
                 address = detailcommadparts[0]
 
                 if not utils.valid_destination(address):
-                    print("Address seems to be invalid, please doublecheck your input after the @-sign")
+                    print("Address seems to be invalid, doublecheck your input after the @-sign")
                     return HELP_COMMAND
                 if detailcommadparts[1] == SEND_FILE_COMMAND:
                     self.send_file(address, message)
@@ -112,7 +120,7 @@ class UserInterface:
                     self.send_message(address, message)
                     return SEND_MESSAGE_COMMAND
                 else:
-                    print("Unkonwn command detail, please doublecheck your input after the :-sign")
+                    print("Unkonwn command detail, doublecheck your input after the :-sign")
                     return INVALID_COMMAND
             else:
                 if not utils.valid_destination(address):
@@ -125,19 +133,41 @@ class UserInterface:
         else:
             return HELP_COMMAND
 
-    def send_file(self, address, filename):
-        address = utils.address_to_md5(address)
-        filedata = utils.read_file(filename)
-        if not filedata:
-            print ("File: " + filename + ", doesn't exist, not sending anything")
+    def send_file(self, destination_address, file_name):
+        # destination_address = Utils.address_to_md5(destination_address)
+        file_data = utils.read_file(file_name)
+        if not file_data:
+            print("File: ", file_name, ", doesn't exist, not sending anything")
         else:
-            print("Preparing packet for file #X, sending out to address: " + address + ", filecontent is: " + str(filedata))
+            # print("Preparing packet for file #X, sending out to address: " + destination_address + ", filecontent is: " + str(filedata))
+            send_message(destination_address, file_data)
 
-    def send_message(self, address, message):
-        address = utils.address_to_md5(address)
-        print("Preparing packet for message #X, sending out to address: " + address + ", message is: " + message)
 
-    def forward_packet(self, l5packet):
+    def send_message(self, destination_address, raw_data):
+        destination_address = Utils.address_to_md5(destination_address)
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('127.0.0.1', PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
+
+        print(source_address)
+        print(bytes.fromhex(source_address))
+        print(Utils.to_hexstring(source_address).encode())
+
+        message = bytes(Layer3(
+            Layer4Data(Layer5(encrypt(raw_data, pk).encode()), True, True, 1, 2, 3),
+            bytes.fromhex(source_address),
+            bytes.fromhex(destination_address),
+            7,
+            packet_type=L3_DATA))
+
+        print(message)
+
+        try:
+            s.sendall(message)
+        except Exception as e:
+            print (e, 'Terminating server ...')
+
+    def forward_packet(self, l5packet, nexthop):
         print("Fowarding Layer 5 packet")
 
     def display_help(self):
@@ -159,14 +189,14 @@ class UserInterface:
             while not utils.valid_mail(mail):
                 mail = input('mail: ')
 
-            self.neighbors[utils.address_to_md5(mail)] = int(ipaddress.IPv4Address(ip))
+            self.neighbors[Utils.address_to_md5(mail)] = int(ipaddress.IPv4Address(ip))
             # backwards conversion: str(ipaddress.IPv4Address(3232235521))
             addmore = input('Add more neighbors? y/n ')
         print("Neighbors given:", self.neighbors)
 
-    def listen_to_neighbors(self):
-        self.routinglistener.start()
-        print ("Listening for routing data on port: " + str(ROUTER_PORT))
+    # def listen_to_neighbors(self):
+    #     self.routinglistener.start()
+    #     print ("Listening for routing data on port: " + str(port))
 
     def send_to_neighbors(self):
         for neighbor in self.neighbors:
@@ -174,6 +204,7 @@ class UserInterface:
             # print(neighbor)
             self.sender_neighbor(str(ipaddress.IPv4Address(self.neighbors[neighbor])))
 
+    #not actually needed as a threat!
     def sender_neighbor(self, address):
         sender = RoutingSender(address, ROUTER_PORT)
         sender.start()
@@ -181,8 +212,9 @@ class UserInterface:
 
 utils = Utils()
 ui = UserInterface()
+sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
+source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
+
 ui.enable_history()
 ui.startup()
 ui.main_loop()
-
-# ui.cleanup_history_vars()
