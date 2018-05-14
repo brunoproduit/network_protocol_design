@@ -40,4 +40,4 @@ class Layer3:
                 Utils.bytes_to_int(packet[5:6]),   # Confirmation ID
                 )
         elif packet[3] == L3_CONFIRMATION:
-             raise ValueError('Layer 3 ACK packet not supported!')
+            raise ValueError('Layer 3 ACK packet not supported!')

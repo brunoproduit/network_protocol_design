@@ -15,10 +15,13 @@ from argparse import ArgumentParser
 import multiprocessing
 import logging
 
+
 def info(): return '%s by %s, version %s' % (NAME, AUTHOR, VERSION)
+
 
 # utils = Utils()
 sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
+
 
 class Listener(multiprocessing.Process):
 
@@ -32,7 +35,6 @@ class Listener(multiprocessing.Process):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         s.bind((self.address, self.port))
-
 
         # Receive loop
         while True:
@@ -51,13 +53,13 @@ class Listener(multiprocessing.Process):
         print ('Closed the server socket')
         print ('Terminating ...')
 
+
 class Sender(multiprocessing.Process):
 
     def __init__(self, address, port):
         multiprocessing.Process.__init__(self)
         self.address = address
         self.port = port
-
 
     def run(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -86,23 +88,23 @@ class RouterProcess(multiprocessing.Process):
         self.neighbors = neighbors
 
     def run(self):
-        router = Router(TEST_MD5_SRC, neighbors)
+        router = Router(TEST_MD5_SRC, self.neighbors)
 
 
 # Main, Program entry, arg parsing
 if __name__ == '__main__':
     parser = ArgumentParser(description=info())
-    parser.add_argument('-H','--host', help='Server TCP port, '\
-                        'defaults to %s' % INET_ADDR, \
+    parser.add_argument('-H', '--host', help='Server TCP port, '
+                        'defaults to %s' % INET_ADDR,
                         default=INET_ADDR)
-    parser.add_argument('-p','--port', type=int, help='Server TCP port, '\
+    parser.add_argument('-p', '--port', type=int, help='Server TCP port, '
                         'defaults to %d' % PORT, default=PORT)
 
     args = parser.parse_args()
 
-    #router = RouterProcess(ROUTER_PORT, neighbors)
-    #router.start()
-    #router.join()
+    # router = RouterProcess(ROUTER_PORT, neighbors)
+    # router.start()
+    # router.join()
 
     listener = Listener('0.0.0.0', PORT)
     sender = Sender(args.host, PORT)
