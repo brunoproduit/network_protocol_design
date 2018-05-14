@@ -6,17 +6,24 @@ Chat program for the network protocol design course
 
 ## Setup
 To start the UI, use:
+
 `python3 interface.py`
+
 
 The user will be prompted with the setup dialog:
 
 First, the user will be asked to provide the location of the master key used to sign PGP keys:
+
 `Insert path for the master_key: 'master_key_path'`
 
+
 Next, the user will be asked for the path to their own key:
+
 `Insert path for the own_node_key: 'your_key_path'`
 
+
 After these two steps the user can start using the chat by using the following commands:
+
 ```
 # Commands ------------------------------------------------------------------------
 ADD_NEIGHBOR_COMMAND = "+"
@@ -31,6 +38,7 @@ HELP_TEXT = "The follwoing commands are valid:\n @mail[:file] Message with space
 UNKNOWN_COMMAND = "unknown"
 INVALID_COMMAND = "invalid"
 ```
+
 
 An example of the setup process and the `help` command can be seen here:
 ![UI](https://github.com/brunoproduit/network_protocol_design/blob/master/ui.PNG)
