@@ -15,6 +15,10 @@ def create_pgpkey(name, email):
             ciphers=[SymmetricKeyAlgorithm.AES256, SymmetricKeyAlgorithm.AES192, SymmetricKeyAlgorithm.AES128],
             compression=CompressionAlgorithm.ZIP)
     return key, key.pubkey
+  
+# returns email of the first UID in the key
+def get_email_from_key(pgpkey):
+    return pgpkey.userids[0].email
 
 # Import key from file
 # @param: filename string

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from constants import *
+from constants import L3_DATA, L3_CONFIRMATION
 from layer4 import Layer4
 from utils import Utils
 
@@ -39,7 +39,7 @@ class Layer3:
                 data=Layer4.parse_l4(packet[40:]),
             )
         elif packet[3] == L3_CONFIRMATION:
-             return Layer3(
+            return Layer3(
                  packet_type=L3_CONFIRMATION,
                  source=Utils.bytes_to_int(packet[8:24]),
                  destination=Utils.bytes_to_int(packet[24:40]),

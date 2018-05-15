@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from constants import *
+from constants import L4_DATA, L4_CHUNKED, L4_ENCRYPTED, L4_ROUTINGFULL
 from layer5 import Layer5
 from routing_table import RoutingTable
 from utils import Utils
