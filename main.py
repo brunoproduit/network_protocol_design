@@ -41,9 +41,11 @@ class Listener(multiprocessing.Process):
             try:
                 data, addr = s.recvfrom(1024)
                 print('Connected by', addr)
-                data = Layer3.parse_l3(data).payload.payload.payload
-                data = decrypt(data, sk)
-                print (data)
+                l5_payload = Layer3.parse_l3(data).payload.payload.payload
+                l5_packet = Layer3.parse_l3(data).payload.payload
+                l5_payload = decrypt(l5_payload, sk)
+                print (l5_payload)
+                print (l5_packet.type.encode())
 
 
             except Exception as e:
