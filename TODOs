@@ -9,7 +9,7 @@
 #TODO: Split interface.py
 
 #TODO: Chunking
-# * Class Chunking Enginee - A threat
+# * Class Chunking Enginee - A thread
 # --> check_integrity
 # --> get_chunks(packet) --> splits the before created packet into a list/array of chunks that can be sent
 # --> add_chunk(chunk) --> adds chunks to a property of the enginee (e.g. packet)
