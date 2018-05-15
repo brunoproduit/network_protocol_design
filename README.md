@@ -21,22 +21,17 @@ Next, the user will be asked for the path to their own key:
 
 `Insert path for the own_node_key: 'your_key_path'`
 
+Next the User will be asked for its neighbors:
 
-After these two steps the user can start using the chat by using the following commands:
+`Add your neighbors: IP:'neighbor IP', mail:'neighbor mail'`
+
+After these three steps the user can start using the chat by using the following commands:
 
 ```
-# Commands ------------------------------------------------------------------------
-ADD_NEIGHBOR_COMMAND = "+"
-REMOVE_NEIGHBOR_COMMAND = "-"
-BROADCAST_MAIL = "@all"
-DETAIL_SEPERATOR = ":"
-SEND_FILE_COMMAND = "file"
-SEND_MESSAGE_COMMAND = "message"
-QUIT_COMMAND = "quit"
-HELP_COMMAND = "help"
-HELP_TEXT = "The follwoing commands are valid:\n @mail[:file] Message with spaces.\n @all[:file] Message with spaces to everyone.\n help Display help. \n quit Exit the program"
-UNKNOWN_COMMAND = "unknown"
-INVALID_COMMAND = "invalid"
+ @mail[:file] - Message with spaces.
+ @all[:file] - Message with spaces to everyone.
+ help - Display help.
+ quit - Exit the program
 ```
 
 
@@ -45,4 +40,3 @@ An example of the setup process and the `help` command can be seen here:
 
 If the user has previously done the setup process, they can choose to overwrite the settings defined in the previous setup:
 ![overwrite](https://github.com/brunoproduit/network_protocol_design/blob/master/overwrite.PNG)
-

@@ -17,14 +17,14 @@ class Layer3:
 
     def __bytes__(self):
         return (
-            chr(self.version) + 
-            Utils.int_to_bytestring(self.packet_number, 2) + 
-            chr(self.type) + 
+            chr(self.version) +
+            Utils.int_to_bytestring(self.packet_number, 2) +
+            chr(self.type) +
             chr(self.ttl) +
-            Utils.int_to_bytestring(self.confirmation_id, 2) + 
-            chr(0) + 
+            Utils.int_to_bytestring(self.confirmation_id, 2) +
+            chr(0) +
             self.source.decode() +
-            self.destination.decode() + 
+            self.destination.decode() +
             (self.payload.__bytes__()).decode()).encode()
 
     @staticmethod
@@ -36,7 +36,7 @@ class Layer3:
                 destination=Utils.bytes_to_int(packet[24:40]),
                 ttl=packet[4],
                 packet=Utils.bytes_to_int(packet[1:2]),
-                data=Layer4.parse_l4(packet[40:]), 
+                data=Layer4.parse_l4(packet[40:]),
             )
         elif packet[3] == L3_CONFIRMATION:
              return Layer3(

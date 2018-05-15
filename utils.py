@@ -9,7 +9,7 @@ class Utils:
     # Helper function to read a file returns a binary string
     # @param:filename string
     # @return: binary string
-    def read_file(self, filename):
+    def read_file(filename):
          if os.path.exists(filename):
              f = open(filename, 'rb')
              data = f.read()
@@ -23,7 +23,7 @@ class Utils:
     # @param:directory string
     # @param:data binary string
     # @param:overwrite boolean
-    def write_file(self, filename, directory, data, overwrite = False):
+    def write_file(filename, directory, data, overwrite = False):
         if os.path.exists(directory+ "/" + filename) and not overwrite:
             print('File already exist, choosing random name...')
             elements = filename.split(".")
@@ -44,7 +44,7 @@ class Utils:
             settingsContent += setting + "=" + settings[setting].keypath + "\n"
 
         # json.dumps(settings.__dict__).encode(),
-        self.write_file(
+        write_file(
             SETTINGSFILE,
             ".",
             settingsContent.encode(),
@@ -57,13 +57,13 @@ class Utils:
     def valid_mail(self, address):
         return re.match(r"[^@]+@[^@]+\.[^@]+", address)
 
-    def address_to_md5(self, address):
+    def address_to_md5(address):
         if address != BROADCAST_MAIL:
             m = hashlib.md5()
             m.update(str.encode(address))
             return m.hexdigest()
         else:
-            return 32 * '0'
+            return 16 * '0'
 
     def valid_ip(self, address):
         try:
@@ -86,10 +86,19 @@ class Utils:
             result += result * 256 + int(byte)
         return result
 
+    def to_hexstring(hex):
+        string = ''
+        hex[0] + hex[1]
+        i = 2
+        while i < len(hex):
+            string += 'x' + hex[i] + hex[i+1]
+            i+=2
+        # return string.replace('x', '\x')
+
 
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
-# # utils.write_file("test.txt", "..", b"Test!")
-# print(utils.read_file("../test.txt"))
+# # write_file("test.txt", "..", b"Test!")
+# print(read_file("../test.txt"))
 # utils.save_settings(pgpsettings)
 # utils.getNeighbors()

@@ -45,6 +45,7 @@ class Listener(multiprocessing.Process):
                 data = decrypt(data, sk)
                 print (data)
 
+
             except Exception as e:
                 print (e, 'Terminating server ...')
                 break
@@ -69,10 +70,10 @@ class Sender(multiprocessing.Process):
         while True:
             data = "Eat some rotten shtrudel!"
             message = bytes(Layer3(
-                Layer4(Layer5(encrypt(data, pk).encode()), L4_DATA, True, True, 1, 2, 3), 
-                b'aaaaaaaaaaaaaaaa', 
-                b'dddddddddddddddd', 
-                7, 
+                Layer4(Layer5(encrypt(data, pk).encode()), L4_DATA, True, True, 1, 2, 3),
+                b'aaaaaaaaaaaaaaaa',
+                b'dddddddddddddddd',
+                7,
                 packet_type=L3_DATA))
 
             try:
@@ -96,7 +97,7 @@ class RouterProcess(multiprocessing.Process):
 if __name__ == '__main__':
     parser = ArgumentParser(description=info())
     parser.add_argument('-H', '--host', help='Server TCP port, '
-                        'defaults to %s' % INET_ADDR, 
+                        'defaults to %s' % INET_ADDR,
                         default=INET_ADDR)
     parser.add_argument('-p', '--port', type=int, help='Server TCP port, '
                         'defaults to %d' % PORT, default=PORT)
