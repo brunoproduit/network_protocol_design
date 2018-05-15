@@ -7,6 +7,8 @@ Chat program for the network protocol design course
 ## Setup
 To start the UI, use:
 
+`pip install pgpy`
+
 `python3 interface.py`
 
 

@@ -44,7 +44,7 @@ class Utils:
             settingsContent += setting + "=" + settings[setting].keypath + "\n"
 
         # json.dumps(settings.__dict__).encode(),
-        write_file(
+        Utils.write_file(
             SETTINGSFILE,
             ".",
             settingsContent.encode(),
@@ -63,7 +63,7 @@ class Utils:
             m.update(str.encode(address))
             return m.hexdigest()
         else:
-            return 16 * '0'
+            return 32 * '0'
 
     def valid_ip(self, address):
         try:

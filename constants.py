@@ -16,6 +16,7 @@ MAX_PDU_SIZE = 100                      # Maximum PDU for communication
 #Protocol -------------------------------------------------------------------------
 ROUTER_PORT = 9999
 TEST_MD5_SRC = 'a'*20
+BROADCAST_ADDRESS = '0' * 32
 
 # Utils ---------------------------------------------------------------------------
 SETTINGSFILE = 'settings.ini'

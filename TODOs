@@ -1,0 +1,16 @@
+#TODO: ACKing of Messages
+
+#TODO: Router (it's not really working for me)
+
+#TODO: Format/Decoding of the MD5 Addresses
+
+#TODO: Sending and encrypting files
+
+#TODO: Split interface.py
+
+#TODO: Chunking
+# * Class Chunking Enginee - A threat
+# --> check_integrity
+# --> get_chunks(packet) --> splits the before created packet into a list/array of chunks that can be sent
+# --> add_chunk(chunk) --> adds chunks to a property of the enginee (e.g. packet)
+# --> get_packet() --> checks if all chunks for the packet are present, then returns the whole packet

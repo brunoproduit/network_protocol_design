@@ -5,6 +5,8 @@ import sys
 import readline
 import rlcompleter
 import atexit
+import codecs
+
 from utils import *
 from constants import *
 from settings import *
@@ -16,14 +18,11 @@ from layer3 import *
 from layer4 import *
 from layer5 import *
 
-#TODO: ACK Packet / Packet Factory
-#TODO: find out how to get the nexthop from routing :)
-
 class UserInterface:
     def __init__(self):
         self.pgpsettings = {}
         if DEVELOPMENT:
-            self.neighbors = {'4db526c3294f17820fd0682d9dceaeb4': 2130706433}
+            self.neighbors = {'4db526c3294f17820fd0682d9dceaeb4': 2130706433, b'aaaaaaaaaaaaaaaa': 2130706433, b'dddddddddddddddd': 2130706433 }
         else:
             self.neighbors = {}
         self.routinglistener = RoutingListener('0.0.0.0', ROUTER_PORT)
@@ -55,7 +54,7 @@ class UserInterface:
 
         self.display_seperator()
         if not DEVELOPMENT:
-            self.enter_neighbors()
+            self.enter_neighbors() # filehandling
         self.display_seperator()
 
         self.routinglistener.start() # router is listening now
@@ -70,7 +69,7 @@ class UserInterface:
             if commandType == HELP_COMMAND:
                 self.display_help()
         self.routinglistener.join()
-        self.routinglistener.quit = True
+        self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
     # parses the pgp settings file
@@ -102,16 +101,16 @@ class UserInterface:
             keyfile.close()
 
     def recognize_command(self, input):
-        input = input.lower()
+        # input = input.lower() # not here!
 
         commandparts = input.split(' ', 1)
         if len(commandparts) > 1:
             detailcommadparts = commandparts[0].split(DETAIL_SEPERATOR) # ":"
-            address = commandparts[0]
+            address = commandparts[0].lower()
             message = commandparts[1]
 
             if len(detailcommadparts) == 2:
-                address = detailcommadparts[0]
+                address = detailcommadparts[0].lower()
 
                 if not utils.valid_destination(address):
                     print("Address seems to be invalid, doublecheck your input after the @-sign")
@@ -151,21 +150,42 @@ class UserInterface:
         destination_address = Utils.address_to_md5(destination_address)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('127.0.0.1', PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
 
-        message = bytes(Layer3(
-            Layer4(Layer5(encrypt(raw_data, pk).encode()), L4_DATA, True, True, 1, 2, 3),
-            b'aaaaaaaaaaaaaaaa', # bytes.fromhex(source_address),
-            b'dddddddddddddddd', # bytes.fromhex(destination_address),
-            7,
-            packet_type=L3_DATA))
+        if(destination_address == BROADCAST_ADDRESS):
+            print('handling broadcast')
+        else:
+            # address = self.md5_to_ip(destination_address) # nexthop
+            # ip_address = router.get_next_hop(destination_address)
+            ip_address = router.get_next_hop(b'dddddddddddddddd') # TODO: nothing coming back
+            print(ip_address)
+            if(ip_address is None):
+                s.connect(('127.0.0.1', PORT))
+            else:
+                s.connect((adip_addressdress, PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
 
-        # print(message)
+            if type == L5_MESSAGE:
+                message = bytes(Layer3(
+                    Layer4(Layer5(encrypt(raw_data, pk).encode()), L4_DATA, True, True, 1, 2, 3),
+                    b'aaaaaaaaaaaaaaaa',
+                    b'dddddddddddddddd',
+                    # bytes.fromhex(source_address),
+                    # bytes.fromhex(destination_address),
+                    # codecs.decode(source_address, 'hex_codec'),
+                    # codecs.decode(destination_address, 'hex_codec'),
+                    7,
+                    packet_type=L3_DATA))
+            elif type == L5_FILE:
+                message = bytes(Layer3(
+                    Layer4(Layer5(encrypt_file(raw_data, pk).encode(), L5_FILE), L4_DATA, True, True, 1, 2, 3),
+                    b'aaaaaaaaaaaaaaaa', # bytes.fromhex(source_address),
+                    b'dddddddddddddddd', # bytes.fromhex(destination_address),
+                    7,
+                    packet_type=L3_DATA))
 
-        try:
-            s.sendall(message)
-        except Exception as e:
-            print (e, 'Terminating server ...')
+            try:
+                s.sendall(message)
+            except Exception as e:
+                print (e, 'Terminating server ...')
 
     def forward_packet(self, l5packet, nexthop):
         print("Fowarding Layer 5 packet")
@@ -200,10 +220,13 @@ class UserInterface:
 
     def send_to_neighbors(self):
         for neighbor in self.neighbors:
-            # print(self.neighbors[neighbor])
-            # print(neighbor)
-            self.sender_neighbor(str(ipaddress.IPv4Address(self.neighbors[neighbor])))
+            self.sender_neighbor(self.md5_to_ip(neighbor))
 
+    def md5_to_ip(self, md5):
+        if md5 in self.neighbors:
+            return str(ipaddress.IPv4Address(self.neighbors[md5]))
+        else:
+            return None
     #not actually needed as a new process!
     def sender_neighbor(self, address):
         sender = RoutingSender(address, ROUTER_PORT)
@@ -216,4 +239,5 @@ source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some w
 
 ui.enable_history()
 ui.startup()
+router = Router(source_address, ui.neighbors)
 ui.main_loop()
