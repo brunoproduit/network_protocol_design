@@ -70,8 +70,8 @@ class Sender(multiprocessing.Process):
             data = "Eat some rotten shtrudel!"
             message = bytes(Layer3(
                 Layer4Data(Layer5(encrypt(data, pk).encode()), True, True, 1, 2, 3),
-                bytes.fromhex("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
-                bytes.fromhex("dddddddddddddddddddddddddddddddd"),
+                b'aaaaaaaaaaaaaaaa', 
+                b'dddddddddddddddd',
                 7,
                 packet_type=L3_DATA))
 

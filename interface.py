@@ -17,7 +17,7 @@ from layer4 import *
 from layer5 import *
 
 #TODO: ACK Packet / Packet Factory
-#TODO find out how to get the nexthop from routing :)
+#TODO: find out how to get the nexthop from routing :)
 
 class UserInterface:
     def __init__(self):
@@ -43,6 +43,7 @@ class UserInterface:
         atexit.register(readline.write_history_file, histfile)
         del os, histfile, readline, rlcompleter
 
+    # startup routine from user interface
     def startup(self):
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
         self.display_seperator()
@@ -60,18 +61,20 @@ class UserInterface:
         self.routinglistener.start() # router is listening now
         self.messagelistener.start() # also messages will be displayed now!
 
+    # main loop routine with command recognition an respond
     def main_loop(self):
         commandType = 'empty'
         while commandType != QUIT_COMMAND:
-            commandInput = input('Give me a command: ')
-            commandType = self.recognize_command(commandInput) # command pattern should probably be used instead of this rubish implementation :D
-            # print(commandType)
+            commandInput = input('')
+            commandType = self.recognize_command(commandInput)
             if commandType == HELP_COMMAND:
                 self.display_help()
         self.routinglistener.join()
         self.routinglistener.quit = True
         print("cya next time!!")
 
+    # parses the pgp settings file
+    # @return: true on parsing false if the file doesn't exist/needs to be overwritten
     def read_pgpkey_settings_file(self):
         if not os.path.exists(SETTINGSFILE) or input("Do you want to overwrite existing settings? (y/n) ").lower() == "y":
             return False
@@ -134,31 +137,28 @@ class UserInterface:
             return HELP_COMMAND
 
     def send_file(self, destination_address, file_name):
-        # destination_address = Utils.address_to_md5(destination_address)
-        file_data = utils.read_file(file_name)
+        file_data = Utils.read_file(file_name)
         if not file_data:
             print("File: ", file_name, ", doesn't exist, not sending anything")
         else:
-            # print("Preparing packet for file #X, sending out to address: " + destination_address + ", filecontent is: " + str(filedata))
-            send_message(destination_address, file_data)
+            self.send_message(destination_address, file_data, L5_FILE)
 
-
-    def send_message(self, destination_address, raw_data):
+    # sends a message through a new udp socket
+    # @param: destination_address string (mail)
+    # @param: raw_data string, payload
+    # @param: type string, type of message defaults to L5_MESSAGE
+    def send_message(self, destination_address, raw_data, type = L5_MESSAGE):
         destination_address = Utils.address_to_md5(destination_address)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('127.0.0.1', PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
 
-        print(source_address)
-        print(bytes.fromhex(source_address))
-        print(Utils.to_hexstring(source_address).encode())
-
         message = bytes(Layer3(
             Layer4Data(Layer5(encrypt(raw_data, pk).encode()), True, True, 1, 2, 3),
-            bytes.fromhex(source_address),
-            bytes.fromhex(destination_address),
+            b'aaaaaaaaaaaaaaaa', # bytes.fromhex(source_address),
+            b'dddddddddddddddd', # bytes.fromhex(destination_address),
             7,
-            packet_type=L3_DATA))
+            packet_type=type))
 
         print(message)
 
@@ -204,7 +204,7 @@ class UserInterface:
             # print(neighbor)
             self.sender_neighbor(str(ipaddress.IPv4Address(self.neighbors[neighbor])))
 
-    #not actually needed as a threat!
+    #not actually needed as a new process!
     def sender_neighbor(self, address):
         sender = RoutingSender(address, ROUTER_PORT)
         sender.start()

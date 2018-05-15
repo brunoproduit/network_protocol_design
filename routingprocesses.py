@@ -30,10 +30,22 @@ class RoutingListener(multiprocessing.Process):
                 if ready[0]:
                     data, addr = s.recvfrom(1024)
                     print('You just received a message from: ', addr)
-                    data = Layer3.parse_l3(data).payload.payload.payload
-                    print (data)
-                    data = decrypt('gibberish', sk)
-                    print (data)
+                    l3_data = Layer3.parse_l3(data)
+                    l5_data = l3_data.payload.payload
+                    data = decrypt(l5_data.payload, sk)
+
+                    if l5_data.packet_type == L5_MESSAGE:
+                        print(l3_data.source, ': ', data)
+                    elif l5_data.packet_type == L5_FILE:
+                        file_name = l3_data.source.split('\x00', 1)[0]
+                        file_data = l3_data.source.split('\x00', 1)[1]
+                        print(l3_data.source, ': sent you a file;', file_name)
+                        Utils.write_file(file_name, '.', file_data)
+                    elif l5_data.packet_type == L5_HASH:
+                        print(l3_data.source, ': sent you a hash;') #
+                    else:
+                        print(l3_data.source, ": sent you something I can't handle")
+
 
             # except Exception as e:
                 # print (e, 'Terminating server ...')
