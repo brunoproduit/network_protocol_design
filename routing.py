@@ -112,7 +112,3 @@ class Graph:
                 return 0
 
         return hops, prev_hop
-
-r = Router("test", [("w",0),("e",2),("q",1)])
-
-print (r.table, r.neighbors, r.graph)
