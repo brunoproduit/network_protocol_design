@@ -33,18 +33,20 @@ class RoutingListener(multiprocessing.Process):
                     l3_data = Layer3.parse_l3(data)
                     l5_data = l3_data.payload.payload
                     data = decrypt(l5_data.payload, sk)
+                    # print(l5_data.type)
 
-                    if l5_data.packet_type == L5_MESSAGE:
+                    if l5_data.type.encode() == L5_MESSAGE:
                         print(l3_data.source, ': ', data)
-                    elif l5_data.packet_type == L5_FILE:
+                    elif l5_data.type.encode() == L5_FILE:
                         file_name = l3_data.source.split('\x00', 1)[0]
                         file_data = l3_data.source.split('\x00', 1)[1]
                         print(l3_data.source, ': sent you a file;', file_name)
                         Utils.write_file(file_name, '.', file_data)
-                    elif l5_data.packet_type == L5_HASH:
+                    elif l5_data.type.encode() == L5_HASH:
                         print(l3_data.source, ': sent you a hash;') #
                     else:
                         print(l3_data.source, ": sent you something I can't handle")
+                        print(l3_data.source, ':', data)
 
 
             # except Exception as e:

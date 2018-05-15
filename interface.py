@@ -154,13 +154,13 @@ class UserInterface:
         s.connect(('127.0.0.1', PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
 
         message = bytes(Layer3(
-            Layer4Data(Layer5(encrypt(raw_data, pk).encode()), True, True, 1, 2, 3),
+            Layer4(Layer5(encrypt(raw_data, pk).encode()), L4_DATA, True, True, 1, 2, 3),
             b'aaaaaaaaaaaaaaaa', # bytes.fromhex(source_address),
             b'dddddddddddddddd', # bytes.fromhex(destination_address),
             7,
-            packet_type=type))
+            packet_type=L3_DATA))
 
-        print(message)
+        # print(message)
 
         try:
             s.sendall(message)
@@ -212,7 +212,6 @@ class UserInterface:
 
 utils = Utils()
 ui = UserInterface()
-sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
 source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
 
 ui.enable_history()
