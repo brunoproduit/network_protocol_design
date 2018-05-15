@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from constants import *
+from constants import L3_DATA, L3_CONFIRMATION
 from layer4 import Layer4
 from utils import Utils
 

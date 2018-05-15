@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from constants import *
+from constants import L5_MESSAGE
 
 
 class Layer5:
