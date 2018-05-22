@@ -15,7 +15,6 @@ from argparse import ArgumentParser
 # Internal imports
 from utils import *
 from constants import *
-from settings import *
 from backgroundprocesses import *
 from constants import *
 from routing import *
@@ -84,15 +83,15 @@ class UserInterface:
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
         self.display_seperator()
 
-        if not self.read_pgpkey_settings_file():
-            self.input_and_add_pgpkey(MASTER_KEY_NAME)
-            self.input_and_add_pgpkey(SELF_KEY_NAME)
-            utils.save_settings(self.pgpsettings)
+        # if not self.read_pgpkey_settings_file():
+        #     self.input_and_add_pgpkey(MASTER_KEY_NAME)
+        #     self.input_and_add_pgpkey(SELF_KEY_NAME)
+        #     utils.save_settings(self.pgpsettings)
 
-        self.display_seperator()
-        if not DEVELOPMENT:
-            self.enter_neighbors() # filehandling
-        self.display_seperator()
+        # self.display_seperator()
+        # if not DEVELOPMENT:
+            # self.enter_neighbors() # filehandling
+        # self.display_seperator()
 
         self.routinglistener.start() # router is listening now
         self.messagelistener.start() # also messages will be displayed now!
@@ -192,18 +191,20 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--pubkey', help='public key file to use', type=str,
                         default=SOURCEKEYPATH)
     args = parser.parse_args()
-    
+
     if args.createkey:
     # can we actually read a new file instead of this?
         source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
-    
+
     elif args.pubkey:
         sk = read_key_from_file(args.pubkey)
         pk = sk.pubkey
-        
+
     utils = Utils()
     ui = UserInterface()
+    neighb = Utils.read_neighbors()
+    print(neighb)
 
     ui.enable_history()
     ui.startup()

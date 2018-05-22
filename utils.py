@@ -1,5 +1,4 @@
 import os, re, uuid, json, ipaddress, struct, socket, hashlib
-from settings import *
 from constants import *
 
 class Utils:
@@ -17,20 +16,22 @@ class Utils:
              return data
          else:
             return False
-            
-    def read(filename):
-		with open(filename) as fn:  
-			line = fn.readline().rstrip()
-			dictionary = "{"
-			elem = line.split('=')
-			dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
-			while line:
-				line = fn.readline().rstrip()
-				if line != "" :
-					elem = line.split('=')
-					dictionary = dictionary + ", \"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
-		dictionary = dictionary + "}"
-		return dictionary
+
+    def read_neighbors():
+        with open(NEIGHBORSFILE) as fn:
+            line = fn.readline().rstrip()
+            neighbors = None
+            dictionary = "[("
+            elem = line.split('=')
+            dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\")"
+            while line:
+                line = fn.readline().rstrip()
+                if line != "" :
+                    
+                    elem = line.split('=')
+                    dictionary = dictionary + ", (\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\")"
+                    dictionary = dictionary + "]"
+            return dictionary
 
 
     # Function to write a file as binary string
@@ -100,7 +101,7 @@ class Utils:
         for byte in bytes:
             result += result * 256 + int(byte)
         return result
-    
+
     @staticmethod
     def hex_decode(bytes_in):
         s = ''
