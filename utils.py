@@ -85,7 +85,13 @@ class Utils:
         for byte in bytes:
             result += result * 256 + int(byte)
         return result
-
+    
+    @staticmethod
+    def hex_decode(bytes_in):
+        s = ''
+        for b in bytes_in:
+            s += "%0.2X" % b
+        return s
 
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
