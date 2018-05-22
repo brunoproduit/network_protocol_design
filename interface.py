@@ -187,10 +187,16 @@ class UserInterface:
 if __name__ == '__main__':
 
     parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
-    parser.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
+    
+    parser.add_argument('-m', '--masterkey', help='Master key file to use', type=str,
+                        default=MASTERKEYPATH)
+    
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
                          this can be used to create a fresh key pair', type=str, default=None)
-    parser.add_argument('-p', '--pubkey', help='public key file to use', type=str,
+    group.add_argument('-p', '--pubkey', help='public key file to use', type=str,
                         default=SOURCEKEYPATH)
+    
     args = parser.parse_args()
     
     if args.createkey:
