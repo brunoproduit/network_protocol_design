@@ -23,8 +23,8 @@ class Layer3:
             chr(self.ttl) +
             Utils.int_to_bytestring(self.confirmation_id, 2) +
             chr(0) +
-            self.source.decode() +
-            self.destination.decode() +
+            Utils.hex_decode(self.source) +
+            Utils.hex_decode(self.destination) +
             (self.payload.__bytes__()).decode()).encode()
 
     @staticmethod

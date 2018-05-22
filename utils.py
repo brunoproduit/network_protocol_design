@@ -86,15 +86,12 @@ class Utils:
             result += result * 256 + int(byte)
         return result
 
-    def to_hexstring(hex):
-        string = ''
-        hex[0] + hex[1]
-        i = 2
-        while i < len(hex):
-            string += 'x' + hex[i] + hex[i+1]
-            i+=2
-        # return string.replace('x', '\x')
-
+    @staticmethod
+    def hex_decode(bytes_in):
+        s = ''
+        for b in bytes_in:
+            s += "%0.2X" % b
+        return s
 
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
