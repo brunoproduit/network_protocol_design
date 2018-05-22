@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# Libraries
 import hashlib
 import re
 import os
@@ -6,7 +10,9 @@ import readline
 import rlcompleter
 import atexit
 import codecs
+from argparse import ArgumentParser
 
+# Internal imports
 from utils import *
 from constants import *
 from settings import *
@@ -177,15 +183,29 @@ class UserInterface:
         sender.start()
         sender.join()
 
+# Main, Program entry, arg parsing
+if __name__ == '__main__':
 
-# can we actually read a new file instead of this?
-source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
-sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
+    parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
+    parser.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
+                         this can be used to create a fresh key pair', type=str, default=None)
+    parser.add_argument('-p', '--pubkey', help='public key file to use', type=str,
+                        default=SOURCEKEYPATH)
+    args = parser.parse_args()
+    
+    if args.createkey:
+    # can we actually read a new file instead of this?
+        source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
+        sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
+    
+    elif args.pubkey:
+        sk = read_key_from_file(args.pubkey)
+        pk = sk.pubkey
+        
+    utils = Utils()
+    ui = UserInterface()
 
-utils = Utils()
-ui = UserInterface()
-
-ui.enable_history()
-ui.startup()
-# router = Router(source_address, ui.neighbors)
-ui.main_loop()
+    ui.enable_history()
+    ui.startup()
+    # router = Router(source_address, ui.neighbors)
+    ui.main_loop()
