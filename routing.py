@@ -3,7 +3,7 @@
 class Router:
 
     # Constructor for the Router class
-    # src is a md5hash
+    # src is a md5hash as string
     # neighbors is a list of tuple (md5hash, ipv4-address)
     def __init__(self, src, neighbors):
         self.neighbors = neighbors
