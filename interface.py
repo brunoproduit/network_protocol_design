@@ -57,6 +57,9 @@ class UserInterface:
             self.enter_neighbors() # filehandling
         self.display_seperator()
 
+        # self.routinglistener.daemon = True
+        # self.messagelistener.daemon = True
+
         self.routinglistener.start() # router is listening now
         self.messagelistener.start() # also messages will be displayed now!
 
@@ -68,7 +71,8 @@ class UserInterface:
             commandType = self.recognize_command(commandInput)
             if commandType == HELP_COMMAND:
                 self.display_help()
-        self.routinglistener.join()
+        self.routinglistener.terminate() # HOWTO terminate a thread using python?
+        self.messagelistener.terminate() # HOWTO terminate a thread using python?
         self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
@@ -100,6 +104,7 @@ class UserInterface:
             print("Adding '" + keyname + "' with value '" + os.path.abspath(keyfile.name) + "'")
             keyfile.close()
 
+    # aufsplitten und wirklich im nachhinein ausführen, würde sicher viel bringen :)
     def recognize_command(self, input):
         # input = input.lower() # not here!
 
@@ -135,6 +140,9 @@ class UserInterface:
         else:
             return HELP_COMMAND
 
+    # sends a file based on it's filename to the given destination address
+    # @param: destination_address md5 value
+    # @param: filename string
     def send_file(self, destination_address, file_name):
         file_data = Utils.read_file(file_name)
         if not file_data:
@@ -214,10 +222,6 @@ class UserInterface:
             addmore = input('Add more neighbors? y/n ')
         print("Neighbors given:", self.neighbors)
 
-    # def listen_to_neighbors(self):
-    #     self.routinglistener.start()
-    #     print ("Listening for routing data on port: " + str(port))
-
     def send_to_neighbors(self):
         for neighbor in self.neighbors:
             self.sender_neighbor(self.md5_to_ip(neighbor))
@@ -227,14 +231,16 @@ class UserInterface:
             return str(ipaddress.IPv4Address(self.neighbors[md5]))
         else:
             return None
-    #not actually needed as a new process!
+
     def sender_neighbor(self, address):
+        # send all the routing data! :D
         sender = RoutingSender(address, ROUTER_PORT)
         sender.start()
         sender.join()
 
 utils = Utils()
 ui = UserInterface()
+# can we actually read a new file instead of this?
 source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
 
 ui.enable_history()

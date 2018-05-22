@@ -7,6 +7,7 @@
 #TODO: Sending and encrypting files
 
 #TODO: Split interface.py
+# --> packetEnginee.py
 
 #TODO: Chunking
 # * Class Chunking Enginee - A thread

@@ -51,6 +51,15 @@ class Utils:
             True
         )
 
+    def read_neighbors():
+        data = read_file('neighbors.ini')
+        if data != False:
+            lines = str(data).split('\n')
+            for line in lines:
+                neighbor = line.split('=') # todo split and stuff! :)
+                pass
+
+
     def valid_destination(self, address):
         return self.valid_mail(address) or address == BROADCAST_MAIL or self.valid_mail(address[1:]) or address == BROADCAST_MAIL[1:]
 
