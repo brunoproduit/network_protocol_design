@@ -40,12 +40,13 @@ class BackgroundListener(multiprocessing.Process):
                     data = decrypt(l5_data.payload, self.sk)
                     print(l3_data.source, ': ', data)
                 elif l5_data.type.encode() == L5_FILE:
-                    data = decrypt_file(l5_data.payload, self.sk) # not working appearently
+                    Utils.write_file('download.tmp', '.', l5_data.payload)
+                    data = decrypt_file('download.tmp', self.sk) # not working appearently
                     # file_name = l3_data.source.split('\x00', 1)[0]
                     # file_data = l3_data.source.split('\x00', 1)[1]
                     file_data = l3_data
                     print(l3_data.source, ': sent you a file;', file_name)
-                    Utils.write_file(file_name, '.', file_data)
+                    Utils.write_file(file_name, '.', file_data.encode())
                 elif l5_data.type.encode() == L5_HASH:
                     print(l3_data.source, ': sent you a hash;') #
                 else:
