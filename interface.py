@@ -198,7 +198,7 @@ if __name__ == '__main__':
         source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
     
-    elif args.pubkey:
+    else:
         sk = read_key_from_file(args.pubkey)
         pk = sk.pubkey
         
