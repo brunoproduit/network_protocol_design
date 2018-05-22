@@ -51,15 +51,6 @@ class Utils:
             True
         )
 
-    def read_neighbors():
-        data = read_file('neighbors.ini')
-        if data != False:
-            lines = str(data).split('\n')
-            for line in lines:
-                neighbor = line.split('=') # todo split and stuff! :)
-                pass
-
-
     def valid_destination(self, address):
         return self.valid_mail(address) or address == BROADCAST_MAIL or self.valid_mail(address[1:]) or address == BROADCAST_MAIL[1:]
 
@@ -94,15 +85,6 @@ class Utils:
         for byte in bytes:
             result += result * 256 + int(byte)
         return result
-
-    def to_hexstring(hex):
-        string = ''
-        hex[0] + hex[1]
-        i = 2
-        while i < len(hex):
-            string += 'x' + hex[i] + hex[i+1]
-            i+=2
-        # return string.replace('x', '\x')
 
 
 # utils = Utils()

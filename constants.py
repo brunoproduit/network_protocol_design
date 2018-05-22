@@ -20,6 +20,7 @@ BROADCAST_ADDRESS = '0' * 32
 
 # Utils ---------------------------------------------------------------------------
 SETTINGSFILE = 'settings.ini'
+NEIGHBORSFILE = 'neighbors.ini'
 MASTERKEYPATH = './keys/masterkey.pgp'
 SOURCEKEYPATH = './keys/sourcekey.pgp'
 MASTER_KEY_NAME = 'master_key'
