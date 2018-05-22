@@ -190,7 +190,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--masterkey', help='Master key file to use', type=str,
                         default=MASTERKEYPATH)
     
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
                          this can be used to create a fresh key pair', type=str, default=None)
     group.add_argument('-p', '--pubkey', help='public key file to use', type=str,
