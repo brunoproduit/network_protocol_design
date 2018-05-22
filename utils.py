@@ -1,5 +1,4 @@
 import os, re, uuid, json, ipaddress, struct, socket, hashlib
-from settings import *
 from constants import *
 
 class Utils:
@@ -19,18 +18,18 @@ class Utils:
             return False
             
     def read(filename):
-		with open(filename) as fn:  
-			line = fn.readline().rstrip()
-			dictionary = "{"
-			elem = line.split('=')
-			dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
-			while line:
-				line = fn.readline().rstrip()
-				if line != "" :
-					elem = line.split('=')
-					dictionary = dictionary + ", \"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
-		dictionary = dictionary + "}"
-		return dictionary
+        with open(filename) as fn:
+            line = fn.readline().rstrip()
+            dictionary = "{"
+            elem = line.split('=')
+            dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
+            while line:
+                line = fn.readline().rstrip()
+                if line != "" :
+                    elem = line.split('=')
+                    dictionary = dictionary + ", \"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
+        dictionary = dictionary + "}"
+        return dictionary
 
 
     # Function to write a file as binary string

@@ -15,7 +15,6 @@ from argparse import ArgumentParser
 # Internal imports
 from utils import *
 from constants import *
-from settings import *
 from backgroundprocesses import *
 from constants import *
 from routing import *
