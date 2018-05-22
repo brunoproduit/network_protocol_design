@@ -106,4 +106,9 @@ def unitTest():
     sk, pk = create_pgpkey("Bruno Produit", "bruno@produit.name")
     assert ("Hello World!" == decrypt(encrypt("Hello World!", pk), sk))
 
+    # File encryption test
+    enc_file = encrypt_file("ui.PNG", pk)
+    open("enc_ui", "w").write(enc_file)
+    dec_file = decrypt_file("enc_ui", sk)
+    open("dec_ui.PNG", "wb").write(dec_file)
 unitTest()
