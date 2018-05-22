@@ -15,7 +15,25 @@ def create_pgpkey(name, email):
             ciphers=[SymmetricKeyAlgorithm.AES256, SymmetricKeyAlgorithm.AES192, SymmetricKeyAlgorithm.AES128],
             compression=CompressionAlgorithm.ZIP)
     return key, key.pubkey
-  
+
+# Writes new RSA PGPkeys to file
+# sk is saved in 'privkey.pem' in ASCII-armored pem format
+# pk is saved in 'pubkey.pem' in ASCII-armored pem format
+# @param: sk PGPkey
+# @param: pk PGPkey.pubkey
+def write_key_to_file(sk, pk):
+    # Open FD
+    privkey = open('privkey.pem', 'w')
+    pubkey = open('pubkey.pem', 'w')
+    
+    # Write the keys
+    privkey.write(str(sk))
+    pubkey.write(str(pk))
+    
+    # Close FD
+    privkey.close()
+    pubkey.close()
+    
 # returns email of the first UID in the key
 def get_email_from_key(pgpkey):
     return pgpkey.userids[0].email
@@ -97,18 +115,27 @@ def verify_md5_hash(m, h):
     return digest.digest() == h
 
 # Unit testing function
-# TODO test file encryption
 def unitTest():
     # Hash test
     assert (verify_md5_hash(b"Hello World!", md5_hash(b"Hello World!")))
     
     # Encryption test
-    sk, pk = create_pgpkey("Bruno Produit", "bruno@produit.name")
+    sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.name")
     assert ("Hello World!" == decrypt(encrypt("Hello World!", pk), sk))
-
+    
+    # Write key to file test
+    write_key_to_file(sk, pk)
+    
     # File encryption test
     enc_file = encrypt_file("ui.PNG", pk)
     open("enc_ui", "w").write(enc_file)
     dec_file = decrypt_file("enc_ui", sk)
     open("dec_ui.PNG", "wb").write(dec_file)
-unitTest()
+
+# unitTest()
+
+
+
+
+
+
