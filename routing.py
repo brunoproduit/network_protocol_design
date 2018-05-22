@@ -20,12 +20,18 @@ class Router:
     def update(self, sender, table):
         if sender not in self.neighbors:
             self.neighbors.append(sender)
+            self.graph.insert_edge((self.graph.src, sender[0], 1))
+
+        if sender[0] not in self.graph.vertices:
+            self.graph.insert_vertice(sender[0])
 
         for i in table:
             if i[2]:
                 self.graph.remove_vertice(i[0])
             else:
-                self.graph.insert_edge(sender[0], i[0], i[3] + 1)
+                self.graph.insert_edge((sender[0], i[0], i[3] + 1))
+                if i[0] not in self.graph.vertices:
+                    self.graph.insert_vertice(i[0])
 
         bf = self.graph.bellman_ford()
 
@@ -37,7 +43,7 @@ class Router:
             return None
 
     # Takes the md5 hash of the destination
-    # Returns ipv4 of the next node in the route to dest
+    # Returns tuple (md5hash, ipv4) of the next node in the route to dest
     # Returns None if dest is not in the list of vertices
     def get_next_hop(self, dest_md5):
         if dest_md5 not in self.prev_hops:
@@ -51,7 +57,7 @@ class Router:
                 # Next hop should be a neighbor
                 for row in self.neighbors:
                     if row[0] == prev_step:
-                        return row[1]
+                        return row
             prev_step = next_step
 
 
@@ -98,12 +104,11 @@ class Graph:
 
         hops[self.src] = 0
 
-        for i in range(1, len(self.vertices)-1):
+        for i in range(0, len(self.vertices)-1):
             for u, v, w in self.edges:
                 if hops[u] + w < hops[v]:
                     hops[v] = hops[u] + w
                     prev_hop[v] = u
-
 
         # Returns 0 if Graph contains a negative-weight cycle
         # (Shouldn't happen as the weights are hop-counts -- always positive)
@@ -112,3 +117,19 @@ class Graph:
                 return 0
 
         return hops, prev_hop
+
+
+#Test
+rt = Router("myhash", [("n1", "1.1.1.1"), ("n2", "2.2.2.2")])
+
+#update from neighbor
+rt.update(("n1", "1.1.1.1"), [("n3", "3.3.3.3", False, 1), ("n4", "4.4.4.4", False, 2)])
+#update from non-neighbor
+rt.update(("n5", "5.5.5.5"), [("n6", "6.6.6.6", False, 1)])
+
+#test nexthops for neighbors
+assert rt.get_next_hop("n5") == ("n5", "5.5.5.5")
+assert rt.get_next_hop("n1") == ("n1", "1.1.1.1")
+
+#test nexthop for non-neighbors
+assert rt.get_next_hop("n3") == ("n1", "1.1.1.1")
