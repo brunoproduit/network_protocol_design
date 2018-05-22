@@ -3,8 +3,8 @@
 class Router:
 
     # Constructor for the Router class
-    # src is a md5hash as string
-    # neighbors is a list of tuple (md5hash, ipv4-address)
+    # @param: src string (md5hash)
+    # @param: neighbors list of tuples (string (md5hash), string (ipv4-address))
     def __init__(self, src, neighbors):
         self.neighbors = neighbors
         self.graph = Graph(src, [(src, i[0], 1) for i in neighbors], [i[0] for i in neighbors])
@@ -14,9 +14,9 @@ class Router:
 
 
     # Is called to update the routing table
-    # sender: tuple(md5hash, ipv4-address)
-    # table: list of tuple(md5hash, ipv4-address, withdraw, distance)
-    # returns None if the update would break the routing table.
+    # @param: sender tuple (sting (md5hash), string(ipv4-address))
+    # @param: table list of tuples (string (md5hash), string (ipv4-address), boolean (withdraw), int (distance))
+    # @return: None (only if the update would break the routing table)
     def update(self, sender, table):
         if sender not in self.neighbors:
             self.neighbors.append(sender)
@@ -43,8 +43,9 @@ class Router:
             return None
 
     # Takes the md5 hash of the destination
-    # Returns tuple (md5hash, ipv4) of the next node in the route to dest
-    # Returns None if dest is not in the list of vertices
+    # @param: dest_md5 string
+    # @return: None (only if dest_md5 is not in the routing table)
+    # @return: tuple (string (md5hash), string (ipv4-address))
     def get_next_hop(self, dest_md5):
         if dest_md5 not in self.prev_hops:
             return None
@@ -69,10 +70,13 @@ class Graph:
         self.edges = edges
         self.vertices = vertices
 
+    # Adds a md5 hash identifier to the list of vertices in the graph
+    # @param: vertice string (md5_hash)
     def insert_vertice(self, vertice):
         self.vertices.append(vertice)
 
-    # tuple (src, dst, weight)
+    # Adds a connection between two vertices to the list of edges in the graph
+    # @param: edge tuple (string (src_md5), string (dest_md5), int (weight))
     def insert_edge(self, edge):
         # Updates weight if edge exists, if not then appends the edge to edges
         if edge not in self.edges:
@@ -82,18 +86,25 @@ class Graph:
                     return
             self.edges.append(edge)
 
-    def remove_vertice(self, vertex):
-        if vertex in self.vertices:
-            self.vertices.remove(vertex)
+    # Removes a vertice from the list of vertices in the graph
+    # @param: vertice string (src_md5)
+    def remove_vertice(self, vertice):
+        if vertice in self.vertices:
+            self.vertices.remove(vertice)
         # Remove all edges connected to the deleted vertex
         for edge in self.edges:
-            if edge[0] == vertex or edge[1] == vertex:
+            if edge[0] == vertice or edge[1] == vertice:
                 self.remove_edge(edge)
 
+    # Removes a connection between two vertices from the list of edges in the graph
+    # @param: edge tuple (string (src_md5), string (dest_md5), int (weight))
     def remove_edge(self, edge):
         if edge in self.edges:
             self.edges.remove(edge)
 
+    # Calculates the distances and gives the path to all vertices
+    # @return: hops dict (string (md5_hash): int (hop-count))
+    # @return: prev_hop dict (string (to_md5): string (from_md5))
     def bellman_ford(self):
         hops = {}
         prev_hop = {}

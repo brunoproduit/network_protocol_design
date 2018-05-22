@@ -16,22 +16,20 @@ class Utils:
              return data
          else:
             return False
-
-    def read_neighbors():
-        with open(NEIGHBORSFILE) as fn:
+            
+    def read(filename):
+        with open(filename) as fn:
             line = fn.readline().rstrip()
-            neighbors = None
-            dictionary = "[("
+            dictionary = "{"
             elem = line.split('=')
-            dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\")"
+            dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
             while line:
                 line = fn.readline().rstrip()
                 if line != "" :
-                    
                     elem = line.split('=')
-                    dictionary = dictionary + ", (\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\")"
-                    dictionary = dictionary + "]"
-            return dictionary
+                    dictionary = dictionary + ", \"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
+        dictionary = dictionary + "}"
+        return dictionary
 
 
     # Function to write a file as binary string
