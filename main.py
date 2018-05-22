@@ -199,7 +199,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if args.createkey:
-    # can we actually read a new file instead of this?
+        # can we actually read a new file instead of this?
         source_address = Utils.address_to_md5("max@mustermann.ee") # TODO: I need some way to get the mail from a pgp file! (crypto part!)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
     
