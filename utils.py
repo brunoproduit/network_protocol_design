@@ -16,20 +16,19 @@ class Utils:
              return data
          else:
             return False
-            
-    def read(filename):
-        with open(filename) as fn:
+
+
+    def read_neighbors_from_neighborfile():
+        with open(NEIGHBORSFILE) as fn:
             line = fn.readline().rstrip()
-            dictionary = "{"
-            elem = line.split('=')
-            dictionary = dictionary + "\"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
+            neighborlist = []
+
             while line:
+                elem = line.split('=')
+                if(Utils.valid_ip(elem[1])): # We don't care about the md5 hash
+                    neighborlist.append((elem[0], elem[1]))
                 line = fn.readline().rstrip()
-                if line != "" :
-                    elem = line.split('=')
-                    dictionary = dictionary + ", \"" + elem[0] + "\"" + ":" + "\"" + elem[1] + "\""
-        dictionary = dictionary + "}"
-        return dictionary
+        return neighborlist
 
 
     # Function to write a file as binary string
@@ -65,12 +64,15 @@ class Utils:
             True
         )
 
-    def valid_destination(self, address):
-        return self.valid_mail(address) or address == BROADCAST_MAIL or self.valid_mail(address[1:]) or address == BROADCAST_MAIL[1:]
+    @staticmethod
+    def valid_destination(address):
+        return Utils.valid_mail(address) or address == BROADCAST_MAIL or Utils.valid_mail(address[1:]) or address == BROADCAST_MAIL[1:]
 
-    def valid_mail(self, address):
+    @staticmethod
+    def valid_mail(address):
         return re.match(r"[^@]+@[^@]+\.[^@]+", address)
 
+    @staticmethod
     def address_to_md5(address):
         if address != BROADCAST_MAIL:
             m = hashlib.md5()
@@ -79,7 +81,8 @@ class Utils:
         else:
             return 32 * '0'
 
-    def valid_ip(self, address):
+    @staticmethod
+    def valid_ip(address):
         try:
             return ipaddress.IPv4Address(address)
         except:

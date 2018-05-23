@@ -26,33 +26,35 @@ class BackgroundListener(multiprocessing.Process):
 
         # Receive loop
         while True:
-            ready = select.select([s], [], [], 1)
-            if ready[0]:
-                data, addr = s.recvfrom(1024)
-                print('You just received a message from: ', addr)
-                l3_data = Layer3.parse_l3(data)
-                l5_data = l3_data.payload.payload
-                # print(l5_data.type.encode())
+            # try:
+                ready = select.select([s], [], [], 1)
+                if ready[0]:
+                    data, addr = s.recvfrom(1024)
+                    l3_data = Layer3.parse_l3(data)
 
-                # TODO: select source-keys from directory or something
+                    l4_data = l3_data.payload
+                    l5_data = l3_data.payload.payload
 
-                if l5_data.type.encode() == L5_MESSAGE:
-                    data = decrypt(l5_data.payload, self.sk)
-                    print(l3_data.source, ': ', data)
-                elif l5_data.type.encode() == L5_FILE:
-                    Utils.write_file('download.tmp', '.', l5_data.payload)
-                    data = decrypt_file('download.tmp', self.sk) # not working appearently
-                    # file_name = l3_data.source.split('\x00', 1)[0]
-                    # file_data = l3_data.source.split('\x00', 1)[1]
-                    file_data = l3_data
-                    print(l3_data.source, ': sent you a file;', file_name)
-                    Utils.write_file(file_name, '.', file_data.encode())
-                elif l5_data.type.encode() == L5_HASH:
-                    print(l3_data.source, ': sent you a hash;') #
-                else:
-                    print(l3_data.source, ": sent you something I can't handle")
-                    print(l3_data.source, ':', data)
+                    # TODO: select source-keys from directory or something
 
+                    if l5_data.type.encode() == L5_MESSAGE:
+                        data = decrypt(l5_data.payload, self.sk)
+                        print(l3_data.source, ': ', data)
+                    elif l5_data.type.encode() == L5_FILE:
+                        Utils.write_file('download.tmp', '.', l5_data.payload)
+                        data = decrypt_file('download.tmp', self.sk)  # not working appearently
+                        # file_name = l3_data.source.split('\x00', 1)[0]
+                        # file_data = l3_data.source.split('\x00', 1)[1]
+                        file_data = l3_data
+                        # print(l3_data.source, ': sent you a file;', file_name)
+                        # Utils.write_file(file_name, '.', file_data.encode())
+                    elif l5_data.type.encode() == L5_HASH:
+                        print(l3_data.source, ': sent you a hash;') #
+                    else:
+                        print(l3_data.source, ": sent you something I can't handle")
+                        print(l3_data.source, ':', data)
+            # except Exception:
+            #     print('Something went wrong..')
         s.close()
         print ('Closed the server socket')
         print ('Terminating ...')

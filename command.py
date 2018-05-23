@@ -1,8 +1,10 @@
 import socket
 
 from constants import *
+from main import router
 
 class Command:
+    @staticmethod
     def execute(type, payload):
         if(type == SEND_MESSAGE_COMMAND or type == SEND_FILE_COMMAND):
             Command.send_message(payload) # TODO: I already need the actual packet here!
@@ -14,6 +16,7 @@ class Command:
             print ('Exiting..')
 
 
+    @staticmethod
     def display_help():
         print(HELP_TEXT)
 
@@ -21,15 +24,16 @@ class Command:
     # @param: destination_address string (mail)
     # @param: raw_data string, payload
     # @param: type string, type of message defaults to L5_MESSAGE
+    @staticmethod
     def send_message(l3_message):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        print(l3_message.destination)
-        print(l3_message.type)
+        # print(l3_message.destination)
+        # print(l3_message.type)
 
         print(l3_message)
-        ip_address = '127.0.0.1' # TODO: Get me from the destination address!
-        # ip_address = router.get_next_hop(b'dddddddddddddddd') # TODO: nothing coming back
+        # ip_address = '127.0.0.1' # TODO: Get me from the destination address!
+        ip_address = router.get_next_hop(l3_message.destination) # TODO: nothing coming back
 
         s.connect((ip_address, PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
         try:

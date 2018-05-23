@@ -17,32 +17,33 @@ class Layer3:
 
     def __bytes__(self):
         return (
-            chr(self.version) +
-            Utils.int_to_bytestring(self.packet_number, 2) +
-            chr(self.type) +
-            chr(self.ttl) +
-            Utils.int_to_bytestring(self.confirmation_id, 2) +
-            chr(0) +
-            Utils.hex_decode(self.source) +
-            Utils.hex_decode(self.destination) +
-            (self.payload.__bytes__()).decode()).encode()
+            (chr(self.version) +
+             Utils.int_to_bytestring(self.packet_number, 2) +
+             chr(self.type) +
+             chr(self.ttl) +
+             Utils.int_to_bytestring(self.confirmation_id, 2) +
+             chr(0)).encode() +
+            self.source +
+            self.destination +
+            self.payload.__bytes__())
+        # use the md5 hash as a integer?
 
     @staticmethod
     def parse_l3(packet):
         if packet[3] == L3_DATA:
             return Layer3(
                 packet_type=L3_DATA,
-                source=Utils.bytes_to_int(packet[8:24]),
-                destination=Utils.bytes_to_int(packet[24:40]),
+                source=packet[8:24].hex(),
+                destination=packet[24:40].hex(),
                 ttl=packet[4],
                 packet=Utils.bytes_to_int(packet[1:2]),
                 data=Layer4.parse_l4(packet[40:]),
             )
         elif packet[3] == L3_CONFIRMATION:
             return Layer3(
-                 packet_type=L3_CONFIRMATION,
-                 source=Utils.bytes_to_int(packet[8:24]),
-                 destination=Utils.bytes_to_int(packet[24:40]),
-                 ttl=packet[4],
-                 confirmation=Utils.bytes_to_int(packet[5:6])
-             )
+                packet_type=L3_CONFIRMATION,
+                source=packet[8:24].hex(),
+                destination=packet[24:40].hex(),
+                ttl=packet[4],
+                confirmation=Utils.bytes_to_int(packet[5:6])
+            )
