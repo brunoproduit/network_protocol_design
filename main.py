@@ -25,6 +25,8 @@ from layer5 import *
 from command import *
 from messageFactory import *
 
+# router = None
+
 class UserInterface:
     def __init__(self):
         self.routinglistener = BackgroundListener('0.0.0.0', ROUTER_PORT, sk)  # TODO: Only for neighbors

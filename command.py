@@ -1,7 +1,6 @@
 import socket
 
 from constants import *
-from main import router
 
 class Command:
     @staticmethod
@@ -33,7 +32,8 @@ class Command:
 
         print(l3_message)
         # ip_address = '127.0.0.1' # TODO: Get me from the destination address!
-        ip_address = router.get_next_hop(l3_message.destination) # TODO: nothing coming back
+        global router
+        ip_address = router.get_next_hop(l3_message.destination)
 
         s.connect((ip_address, PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
         try:

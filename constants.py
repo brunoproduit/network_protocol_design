@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+from routing import *
+
 # General -----------------------------------------------------------------------------------------------------------
 NAME = 'Network protocol design chat '                                                        # Name of program
 AUTHOR = 'Sander Mikelsaar, Sasan Reyaeifars, Florian Reiter, Bruno Produit, Pavel Chikul'    # Author of program
@@ -8,13 +10,13 @@ VERSION = '1.0'                                                                 
 DEVELOPMENT = True
 
 # UDP -----------------------------------------------------------------------------
-PORT = 1337                             # Default UDP port, can be changed in arg
+PORT = 1338                             # Default UDP port, can be changed in arg
 INET_ADDR = '127.0.0.1'                 # Default IP, can be changed in arg
 UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
 MAX_PDU_SIZE = 100                      # Maximum PDU for communication
 
 #Protocol -------------------------------------------------------------------------
-ROUTER_PORT = 9999
+ROUTER_PORT = 8999
 TEST_MD5_SRC = 'a'*20
 BROADCAST_ADDRESS = '0' * 32
 
@@ -52,3 +54,6 @@ L4_ENCRYPTED = 8
 # L3 ------------------------------------------------------------------------
 L3_DATA = 0x02
 L3_CONFIRMATION = 0x04
+
+# Globals -------------------------------------------------------------------
+source_address = 'f'*32
