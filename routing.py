@@ -12,7 +12,6 @@ class Router:
         self.table = bf[0]
         self.prev_hops = bf[1]
 
-
     # Is called to update the routing table
     # @param: sender tuple (sting (md5hash), string(ipv4-address))
     # @param: table list of tuples (string (md5hash), string (ipv4-address), boolean (withdraw), int (distance))
@@ -60,7 +59,6 @@ class Router:
                     if row[0] == prev_step:
                         return row
             prev_step = next_step
-
 
 
 # Graph class which represents the acyclic graph used to calculate bellman-ford
@@ -115,7 +113,7 @@ class Graph:
 
         hops[self.src] = 0
 
-        for i in range(0, len(self.vertices)-1):
+        for i in range(0, len(self.vertices) - 1):
             for u, v, w in self.edges:
                 if hops[u] + w < hops[v]:
                     hops[v] = hops[u] + w
@@ -129,20 +127,21 @@ class Graph:
 
         return hops, prev_hop
 
+
 def testCase():
-    #Test
+    # Test
     rt = Router("myhash", [("n1", "1.1.1.1"), ("n2", "2.2.2.2")])
 
-    #update from neighbor
+    # update from neighbor
     rt.update(("n1", "1.1.1.1"), [("n3", "3.3.3.3", False, 1), ("n4", "4.4.4.4", False, 2)])
-    #update from non-neighbor
+    # update from non-neighbor
     rt.update(("n5", "5.5.5.5"), [("n6", "6.6.6.6", False, 1)])
 
-    #test nexthops for neighbors
+    # test nexthops for neighbors
     assert rt.get_next_hop("n5") == ("n5", "5.5.5.5")
     assert rt.get_next_hop("n1") == ("n1", "1.1.1.1")
 
-    #test nexthop for non-neighbors
+    # test nexthop for non-neighbors
     assert rt.get_next_hop("n3") == ("n1", "1.1.1.1")
 
 # testCase()

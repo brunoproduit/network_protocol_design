@@ -36,9 +36,10 @@ SEND_FILE_COMMAND = "file"
 SEND_MESSAGE_COMMAND = "message"
 QUIT_COMMAND = "quit"
 HELP_COMMAND = "help"
-HELP_TEXT = "The following commands are valid:\n @mail[:file] - Message with spaces. (e.g. @maxmu@ttu.ee:file secret.doc, @mimmu@ttu.ee Hello World!)\n @all[:file] - Message with spaces to everyone. (e.g. @all:file secret.doc, @all Hello World!)\n help - Display help. \n quit - Exit the program"
+HELP_TEXT = "The following commands are valid:\n @mail[:file] - Message with spaces. (e.g. @maxmu@ttu.ee:file secret.doc, @mimmu@ttu.ee Hello World!)\n @all[:file] - Message with spaces to everyone. (e.g. @all:file secret.doc, @all Hello World!)\n md5 text to convert to md5 \n help - Display help. \n quit - Exit the program"
 UNKNOWN_COMMAND = "unknown"
 INVALID_COMMAND = "invalid"
+MD5_COMMAND = "md5"
 
 # L5 ------------------------------------------------------------------------
 L5_MESSAGE = b'\x01'

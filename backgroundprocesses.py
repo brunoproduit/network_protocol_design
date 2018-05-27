@@ -15,7 +15,7 @@ class BackgroundListener(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         self.address = address
         self.port = port
-        self.sk = sk
+        self.sk = sk # should be global as well I guess!
 
     def run(self):
 
@@ -58,32 +58,3 @@ class BackgroundListener(multiprocessing.Process):
         s.close()
         print ('Closed the server socket')
         print ('Terminating ...')
-
-class BackgroundSender(multiprocessing.Process):
-
-    def __init__(self, ip_source_address, port, data, source_address, destination_address):
-        multiprocessing.Process.__init__(self)
-        self.address = ip_source_address
-        self.port = port
-
-
-    def run(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('127.0.0.1', PORT)) # replace 127.0.0.1 with whatever the routing translation gives you!
-
-        print(self.source_address)
-        print(bytes.fromhex(self.source_address))
-
-        message = bytes(Layer3(
-            Layer4Data(Layer5(encrypt(raw_data, pk).encode()), True, True, 1, 2, 3),
-            bytes.fromhex(source_address),
-            bytes.fromhex(destination_address),
-            7,
-            packet_type=L3_DATA))
-
-        print(message)
-
-        try:
-            s.sendall(message)
-        except Exception as e:
-            print (e, 'Terminating server ...')

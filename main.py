@@ -9,23 +9,11 @@ import sys
 import readline
 import rlcompleter
 import atexit
-import codecs
 from argparse import ArgumentParser
 
-# Internal imports
-from utils import *
-from constants import *
 from backgroundprocesses import *
-from constants import *
-from routing import *
-from crypto import *
-from layer3 import *
-from layer4 import *
-from layer5 import *
 from command import *
 from messageFactory import *
-
-# router = None
 
 class UserInterface:
     def __init__(self):
@@ -68,26 +56,32 @@ class UserInterface:
     # recognizes the command and returns it's type and payload
     def recognize_command(self, input):
         commandparts = input.split(' ', 1)
-        if len(commandparts) > 1:
-            detailcommadparts = commandparts[0].split(DETAIL_SEPERATOR)
-            destination_address = commandparts[0].lower()
-            payload = commandparts[1]  # can be either Textmessage or a Filename
 
-            if len(detailcommadparts) == 2:
-                destination_address = detailcommadparts[0].lower()
+        if input.startswith(MD5_COMMAND + ' '):
+            return MD5_COMMAND, input[4:]
+
+        if len(commandparts) > 1:
+
+            # handle address based commands
+            detail_command_parts = commandparts[0].split(DETAIL_SEPERATOR)
+            destination_address = commandparts[0].lower()
+            payload = commandparts[1]  # can be either text-message or a filename
+
+            if len(detail_command_parts) == 2:
+                destination_address = detail_command_parts[0].lower()
                 if not Utils.valid_destination(destination_address):
-                    return INVALID_COMMAND, "Address seems to be invalid, doublecheck your input after the @-sign"
-                if detailcommadparts[1] == SEND_FILE_COMMAND:
+                    return INVALID_COMMAND, "Address seems to be invalid, double-check your input after the @-sign"
+                if detail_command_parts[1] == SEND_FILE_COMMAND:
                     file_data = Utils.read_file(payload)
                     if not file_data:
                         return INVALID_COMMAND, "File: " + payload + ", doesn't exist, not sending anything"
                     payload = MessageFactory.createFileMessage(source_address, destination_address, file_data, pk)
                     return SEND_FILE_COMMAND, payload
-                if detailcommadparts[1] == SEND_MESSAGE_COMMAND:
+                if detail_command_parts[1] == SEND_MESSAGE_COMMAND:
                     payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
                     return SEND_MESSAGE_COMMAND, payload
                 else:
-                    return INVALID_COMMAND, "Unkonwn command detail, doublecheck your input after the :-sign"
+                    return INVALID_COMMAND, "Unknown command detail, double-check your input after the :-sign"
             else:
                 if not Utils.valid_destination(destination_address):
                     return INVALID_COMMAND, "Address seems to be invalid, please doublecheck your input after the @-sign"
@@ -131,16 +125,5 @@ if __name__ == '__main__':
     utils = Utils()
     ui = UserInterface()
     ui.enable_history()
-
-    ui.display_seperator()
-    print('Reading in neighbors from ', NEIGHBORSFILE)
-    neighbors = Utils.read_neighbors_from_neighborfile()
-    print(neighbors)
-    print('Finished reading neighbors')
-    ui.display_seperator()
-
-    global router
-    router = Router(source_address, neighbors)
-
     ui.startup()
     ui.main_loop()

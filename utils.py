@@ -74,7 +74,10 @@ class Utils:
 
     @staticmethod
     def address_to_md5(address):
+
         if address != BROADCAST_MAIL:
+            if address.startswith('@'):  # remove first character if it's the @-sign!
+                address = address[1:]
             m = hashlib.md5()
             m.update(str.encode(address))
             return m.hexdigest()
