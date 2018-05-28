@@ -48,3 +48,28 @@ class MessageFactory:
 
             )
         )
+
+    # creates a routingtable-connect message
+    # @param: source_address md5 value
+    # @param: destination_address md5 value
+    # @param: routingtable bytes from RoutingTable.__bytes__()
+    # @param: pk public key of the recipient
+    @staticmethod
+    def createConnectMessage(source_address, destination_address, routingtable, pk):
+        destination_address = Utils.address_to_md5(destination_address)
+        return Layer3(
+            Layer4(Layer5(encrypt(routingtable, pk).encode()), L4_ROUTINGFULL, True, True, 1, 2, 3),
+            bytes.fromhex(source_address),
+            bytes.fromhex(destination_address))
+
+    # creates a routingtable-disconnect message
+    # @param: destination_address md5 value
+    # @param: routingtable bytes from RoutingTable.__bytes__()
+    # @param: pk public key of the recipient
+    @staticmethod
+    def createDisconnectMessage(source_address, destination_address, pk):
+        destination_address = Utils.address_to_md5(destination_address)
+        return Layer3(
+            Layer4(Layer5(encrypt(None, pk)), L4_ROUTINGFULL),
+            bytes.fromhex(source_address),
+            bytes.fromhex(destination_address))
