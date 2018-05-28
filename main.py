@@ -103,16 +103,9 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
 
-    parser.add_argument('-m', '--masterkey', help='Master key file to use', type=str,
-                        default=MASTERKEYPATH)
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
+    parser.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
                          this can be used to create a fresh key pair', type=str, default=None)
-    group.add_argument('-p', '--pubkey', help='Public key file to use', type=str,
-                        default=SOURCEKEYPATH)
-    group.add_argument('-i', '--init', help='Init file containing all informations about keys', type=str,
-                        default=SOURCEKEYPATH)
     
     args = parser.parse_args()
 
@@ -122,12 +115,6 @@ if __name__ == '__main__':
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
 
-    elif args.pubkey:
-        sk = read_key_from_file(args.pubkey)
-        pk = sk.pubkey
-    
-    elif args.init:
-        initfile = args.init
     
     utils = Utils()
     ui = UserInterface()
