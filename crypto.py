@@ -8,12 +8,12 @@ from pgpy.constants import PubKeyAlgorithm, KeyFlags, HashAlgorithm,\
 # @param: email: string
 # @return: (sk PGPkey, pk PGPkey.pubkey)
 def create_pgpkey(name, email):
-    key = pgpy.PGPKey.new(PubKeyAlgorithm.RSAEncryptOrSign, 4096)
+    key = pgpy.PGPKey.new(PubKeyAlgorithm.RSAEncryptOrSign, 2048)
     uid = pgpy.PGPUID.new(name, email=email)
     key.add_uid(uid, usage={KeyFlags.Sign, KeyFlags.EncryptCommunications, KeyFlags.EncryptStorage},
-            hashes=[HashAlgorithm.SHA512, HashAlgorithm.SHA384, HashAlgorithm.SHA256, HashAlgorithm.SHA224],
-            ciphers=[SymmetricKeyAlgorithm.AES256, SymmetricKeyAlgorithm.AES192, SymmetricKeyAlgorithm.AES128],
-            compression=CompressionAlgorithm.ZIP)
+            hashes=[HashAlgorithm.SHA512],
+            ciphers=[SymmetricKeyAlgorithm.AES128],
+            compression=None)
     return key, key.pubkey
 
 # Writes new RSA PGPkeys to file
