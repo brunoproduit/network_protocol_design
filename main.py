@@ -11,7 +11,7 @@ from messageFactory import *
 
 class UserInterface:
     def __init__(self):
-        self.routinglistener = BackgroundListener('0.0.0.0', ROUTER_PORT, sk)  # TODO: Only for neighbors
+        self.routinglistener = BackgroundListener('0.0.0.0', ROUTER_PORT, sk)
         self.messagelistener = BackgroundListener('0.0.0.0', PORT, sk)
 
     def enable_history(self):
@@ -69,7 +69,7 @@ class UserInterface:
                     file_data = Utils.read_file(payload)
                     if not file_data:
                         return INVALID_COMMAND, "File: " + payload + ", doesn't exist, not sending anything"
-                    payload = MessageFactory.createFileMessage(source_address, destination_address, file_data, pk)
+                    payload = MessageFactory.createFileMessage(source_address, destination_address, payload, file_data, pk)
                     return SEND_FILE_COMMAND, payload
                 if detail_command_parts[1] == SEND_MESSAGE_COMMAND:
                     payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
@@ -103,13 +103,12 @@ if __name__ == '__main__':
                          this can be used to create a fresh key pair', type=str, default=None)
     group.add_argument('-p', '--pubkey', help='Public key file to use', type=str,
                         default=SOURCEKEYPATH)
-    group.add_argument('-i', '--init', help='Init file containing all informations about keys', type=str,
+    group.add_argument('-i', '--init', help='Init file containing all information about the keys', type=str,
                         default=SOURCEKEYPATH)
     
     args = parser.parse_args()
 
     if args.createkey:
-        # can we actually read a new file instead of this?
         source_address = Utils.address_to_md5("max@mustermann.ee")
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
