@@ -101,7 +101,7 @@ def verify(masterkeyfile, pkfile):
 def md5_hash(m):
     digest = hashlib.md5()
     for i in range(0, len(m), 512):
-        digest.update(m[i:i+512])
+        digest.update(m[i:i+512].encode('utf-8'))
     return digest.digest()
 
 # Verify MD5 hash
@@ -111,7 +111,7 @@ def md5_hash(m):
 def verify_md5_hash(m, h):
     digest = hashlib.md5()
     for i in range(0, len(m), 512):
-        digest.update(m[i:i+512])
+        digest.update(m[i:i+512].encode('utf-8'))
     return digest.digest() == h
 
 # Unit testing function
@@ -133,9 +133,3 @@ def unitTest():
     open("dec_ui.PNG", "wb").write(dec_file)
 
 # unitTest()
-
-
-
-
-
-

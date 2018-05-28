@@ -13,7 +13,7 @@ class Router:
         self.prev_hops = bf[1]
 
     # Is called to update the routing table
-    # @param: sender tuple (sting (md5hash), string(ipv4-address))
+    # @param: sender tuple (string (md5hash), string(ipv4-address))
     # @param: table list of tuples (string (md5hash), string (ipv4-address), boolean (withdraw), int (distance))
     # @return: None (only if the update would break the routing table)
     def update(self, sender, table):
@@ -28,7 +28,7 @@ class Router:
             if i[2]:
                 self.graph.remove_vertice(i[0])
             else:
-                self.graph.insert_edge((sender[0], i[0], i[3] + 1))
+                self.graph.insert_edge((sender[0], i[0], i[3]))
                 if i[0] not in self.graph.vertices:
                     self.graph.insert_vertice(i[0])
 
