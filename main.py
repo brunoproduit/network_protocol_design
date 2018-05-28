@@ -104,8 +104,8 @@ class UserInterface:
             commandInput = input('')
             commandType, payload = self.recognize_command(commandInput)
             Command.execute(commandType, payload)
-        self.routinglistener.terminate() # HOWTO terminate a thread using python?
-        self.messagelistener.terminate() # HOWTO terminate a thread using python?
+        self.routinglistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
+        self.messagelistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
         self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
@@ -193,7 +193,9 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
                          this can be used to create a fresh key pair', type=str, default=None)
-    group.add_argument('-p', '--pubkey', help='public key file to use', type=str,
+    group.add_argument('-p', '--pubkey', help='Public key file to use', type=str,
+                        default=SOURCEKEYPATH)
+    group.add_argument('-i', '--init', help='Init file containing all informations about keys', type=str,
                         default=SOURCEKEYPATH)
     
     args = parser.parse_args()
