@@ -125,7 +125,10 @@ if __name__ == '__main__':
     elif args.pubkey:
         sk = read_key_from_file(args.pubkey)
         pk = sk.pubkey
-
+    
+    elif args.init:
+        initfile = args.init
+    
     utils = Utils()
     ui = UserInterface()
     ui.enable_history()
