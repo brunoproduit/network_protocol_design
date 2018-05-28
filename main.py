@@ -41,8 +41,10 @@ class UserInterface:
             commandInput = input('')
             commandType, payload = self.recognize_command(commandInput)
             Command.execute(commandType, payload)
-        self.routinglistener.terminate()
-        self.messagelistener.terminate()
+
+        self.routinglistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
+        self.messagelistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
+        self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
     # recognizes the command and returns it's type and payload
@@ -99,9 +101,11 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
                          this can be used to create a fresh key pair', type=str, default=None)
-    group.add_argument('-p', '--pubkey', help='public key file to use', type=str,
-                       default=SOURCEKEYPATH)
-
+    group.add_argument('-p', '--pubkey', help='Public key file to use', type=str,
+                        default=SOURCEKEYPATH)
+    group.add_argument('-i', '--init', help='Init file containing all informations about keys', type=str,
+                        default=SOURCEKEYPATH)
+    
     args = parser.parse_args()
 
     if args.createkey:
@@ -113,7 +117,10 @@ if __name__ == '__main__':
     elif args.pubkey:
         sk = read_key_from_file(args.pubkey)
         pk = sk.pubkey
-
+    
+    elif args.init:
+        initfile = args.init
+    
     utils = Utils()
     ui = UserInterface()
     ui.enable_history()
