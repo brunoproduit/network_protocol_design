@@ -42,9 +42,8 @@ class UserInterface:
             commandType, payload = self.recognize_command(commandInput)
             Command.execute(commandType, payload)
 
-        self.routinglistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
-        self.messagelistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
-        self.routinglistener.quit = True # file that tells if its readable
+        self.routinglistener.terminate()
+        self.messagelistener.terminate()
         print("cya next time!!")
 
     # recognizes the command and returns it's type and payload
@@ -55,7 +54,6 @@ class UserInterface:
             return MD5_COMMAND, input[4:]
 
         if len(commandparts) > 1:
-
             # handle address based commands
             detail_command_parts = commandparts[0].split(DETAIL_SEPERATOR)
             destination_address = commandparts[0].lower()
@@ -63,26 +61,35 @@ class UserInterface:
 
             if len(detail_command_parts) == 2:
                 destination_address = detail_command_parts[0].lower()
+
                 if not Utils.valid_destination(destination_address):
                     return INVALID_COMMAND, "Address seems to be invalid, double-check your input after the @-sign"
+
                 if detail_command_parts[1] == SEND_FILE_COMMAND:
                     file_data = Utils.read_file(payload)
                     if not file_data:
                         return INVALID_COMMAND, "File: " + payload + ", doesn't exist, not sending anything"
+
                     payload = MessageFactory.createFileMessage(source_address, destination_address, payload, file_data, pk)
                     return SEND_FILE_COMMAND, payload
+
                 if detail_command_parts[1] == SEND_MESSAGE_COMMAND:
                     payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
                     return SEND_MESSAGE_COMMAND, payload
+
                 else:
                     return INVALID_COMMAND, "Unknown command detail, double-check your input after the :-sign"
+
             else:
                 if not Utils.valid_destination(destination_address):
                     return INVALID_COMMAND, "Address seems to be invalid, please doublecheck your input after the @-sign"
+
                 payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
                 return SEND_MESSAGE_COMMAND, payload
+
         elif input == QUIT_COMMAND:
             return QUIT_COMMAND, None
+
         else:
             return HELP_COMMAND, None
 
