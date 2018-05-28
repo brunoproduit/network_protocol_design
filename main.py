@@ -2,13 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Libraries
-import hashlib
-import re
-import os
-import sys
 import readline
-import rlcompleter
-import atexit
 from argparse import ArgumentParser
 
 from backgroundprocesses import *
@@ -30,10 +24,6 @@ class UserInterface:
         except IOError:
             pass
 
-    def cleanup_history_vars(self):
-        atexit.register(readline.write_history_file, histfile)
-        del os, histfile, readline, rlcompleter
-
     # startup routine from user interface
     def startup(self):
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
@@ -41,6 +31,8 @@ class UserInterface:
 
         self.routinglistener.start()  # router is listening now
         self.messagelistener.start()  # also messages will be displayed now!
+
+        # do the routing startup / start the routing update routine for every 30 seconds!
 
     # main loop routine with command recognition an respond
     def main_loop(self):

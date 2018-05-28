@@ -52,4 +52,4 @@ class Command:
                 ip_address = address_tuple[1]
                 Command.send_message(l3_message, ip_address)
             else:
-                print (l3_message.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
+                print(l3_message.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')

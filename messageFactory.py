@@ -36,3 +36,15 @@ class MessageFactory:
             bytes.fromhex(destination_address),
             7,
             packet_type=L3_DATA)
+
+    # forms a basic ACK message out of src, dest and pk
+    @staticmethod
+    def createACK(source_address, destination_address, pk):
+        return Layer3(
+            Layer4(
+                Layer5(
+                    encrypt(None, pk),
+                    0),
+
+            )
+        )

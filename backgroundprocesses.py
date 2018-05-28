@@ -9,13 +9,16 @@ from layer4 import *
 from layer5 import *
 
 # Thread instead of process
+from messageFactory import MessageFactory
+
+
 class BackgroundListener(multiprocessing.Process):
 
     def __init__(self, address, port, sk):
         multiprocessing.Process.__init__(self)
         self.address = address
         self.port = port
-        self.sk = sk # should be global as well I guess!
+        self.sk = sk  # should be global as well I guess!
 
     def run(self):
 
@@ -40,6 +43,7 @@ class BackgroundListener(multiprocessing.Process):
                     if l5_data.type.encode() == L5_MESSAGE:
                         data = decrypt(l5_data.payload, self.sk)
                         print(l3_data.source, ': ', data)
+                        MessageFactory.createACK()
                     elif l5_data.type.encode() == L5_FILE:
                         Utils.write_file('download.tmp', '.', l5_data.payload)
                         data = decrypt_file('download.tmp', self.sk)  # not working appearently
@@ -48,8 +52,7 @@ class BackgroundListener(multiprocessing.Process):
                         file_data = l3_data
                         # print(l3_data.source, ': sent you a file;', file_name)
                         # Utils.write_file(file_name, '.', file_data.encode())
-                    elif l5_data.type.encode() == L5_HASH:
-                        print(l3_data.source, ': sent you a hash;') #
+
                     else:
                         print(l3_data.source, ": sent you something I can't handle")
                         print(l3_data.source, ':', data)
