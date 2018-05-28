@@ -26,13 +26,25 @@ class MessageFactory:
     # @param: destination_address md5 value
     # @param: filename string
     @staticmethod
-    def createFileMessage(source_address, destination_address, raw_data, pk):
+    def createFileMessage(source_address, destination_address, filename, raw_data, pk):
         destination_address = Utils.address_to_md5(destination_address)
         return Layer3(
-            Layer4(Layer5(encrypt_file(raw_data, pk).encode(), L5_FILE), L4_DATA, True, True, 1, 2, 3),
+            Layer4(Layer5(encrypt_file(filename + '\00' + raw_data, pk).encode(), L5_FILE), L4_DATA, True, True, 1, 2, 3),
             # b'aaaaaaaaaaaaaaaa',
             # b'dddddddddddddddd',
             bytes.fromhex(source_address),
             bytes.fromhex(destination_address),
             7,
             packet_type=L3_DATA)
+
+    # forms a basic ACK message out of src, dest and pk
+    @staticmethod
+    def createACK(source_address, destination_address, pk):
+        return Layer3(
+            Layer4(
+                Layer5(
+                    encrypt(None, pk),
+                    0),
+
+            )
+        )

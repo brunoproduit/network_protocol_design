@@ -2,13 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Libraries
-import hashlib
-import re
-import os
-import sys
 import readline
-import rlcompleter
-import atexit
 from argparse import ArgumentParser
 
 from backgroundprocesses import *
@@ -17,7 +11,7 @@ from messageFactory import *
 
 class UserInterface:
     def __init__(self):
-        self.routinglistener = BackgroundListener('0.0.0.0', ROUTER_PORT, sk)  # TODO: Only for neighbors
+        self.routinglistener = BackgroundListener('0.0.0.0', ROUTER_PORT, sk)
         self.messagelistener = BackgroundListener('0.0.0.0', PORT, sk)
 
     def enable_history(self):
@@ -30,10 +24,6 @@ class UserInterface:
         except IOError:
             pass
 
-    def cleanup_history_vars(self):
-        atexit.register(readline.write_history_file, histfile)
-        del os, histfile, readline, rlcompleter
-
     # startup routine from user interface
     def startup(self):
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
@@ -41,6 +31,8 @@ class UserInterface:
 
         self.routinglistener.start()  # router is listening now
         self.messagelistener.start()  # also messages will be displayed now!
+
+        # do the routing startup / start the routing update routine for every 30 seconds!
 
     # main loop routine with command recognition an respond
     def main_loop(self):
@@ -77,7 +69,7 @@ class UserInterface:
                     file_data = Utils.read_file(payload)
                     if not file_data:
                         return INVALID_COMMAND, "File: " + payload + ", doesn't exist, not sending anything"
-                    payload = MessageFactory.createFileMessage(source_address, destination_address, file_data, pk)
+                    payload = MessageFactory.createFileMessage(source_address, destination_address, payload, file_data, pk)
                     return SEND_FILE_COMMAND, payload
                 if detail_command_parts[1] == SEND_MESSAGE_COMMAND:
                     payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
@@ -110,7 +102,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.createkey:
-        # can we actually read a new file instead of this?
         source_address = Utils.address_to_md5("max@mustermann.ee")
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")

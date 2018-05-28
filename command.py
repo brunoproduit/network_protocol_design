@@ -6,10 +6,13 @@ from globals import router
 
 
 class Command:
+    # executes a command based on type and payload
+    # @param: type string
+    # @param: payload whatever needs to be handled (either text or bytes)
     @staticmethod
     def execute(type, payload):
         if(type == SEND_MESSAGE_COMMAND or type == SEND_FILE_COMMAND):
-            Command.handle_send_message(payload) # TODO: I already need the actual packet here!
+            Command.handle_send_message(payload)
         elif(type == HELP_COMMAND):
             Command.display_help()
         elif(type == INVALID_COMMAND):
@@ -32,7 +35,7 @@ class Command:
     def send_message(l3_message, ip_address):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        s.connect((ip_address, PORT))  # replace 127.0.0.1 with whatever the routing translation gives you!
+        s.connect((ip_address, PORT)) # PORT could also be used somewhere else!
         try:
             s.sendall(bytes(l3_message))
         except Exception as e:
@@ -40,7 +43,6 @@ class Command:
 
     @staticmethod
     def handle_send_message(l3_message):
-
         global router
         if l3_message.destination.hex() == BROADCAST_ADDRESS:
             for neighbor in router.neighbors:
@@ -52,4 +54,4 @@ class Command:
                 ip_address = address_tuple[1]
                 Command.send_message(l3_message, ip_address)
             else:
-                print (l3_message.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
+                print(l3_message.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
