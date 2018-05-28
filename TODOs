@@ -1,15 +1,12 @@
-#TODO: ACKing of Messages
+#TODO: ACKing of Messages --> Into the backgroundprocesses.py (Listener)
 
-#TODO: Router (it's not really working for me)
+#TODO: Router (it's not really working for me) --> Touple
 
-#TODO: Format/Decoding of the MD5 Addresses
+#TODO: Format/Decoding of the MD5 Addresses --> Other group
 
-#TODO: Sending and encrypting files
+#TODO: Sending and encrypting files --> Last piece
 
-#TODO: Split interface.py
-# --> packetEnginee.py
-
-#TODO: Chunking
+#TODO: Chunking --> Started
 # * Class Chunking Enginee - A thread
 # --> check_integrity
 # --> get_chunks(packet) --> splits the before created packet into a list/array of chunks that can be sent
