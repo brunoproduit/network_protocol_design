@@ -29,9 +29,7 @@ class MessageFactory:
     def createFileMessage(source_address, destination_address, filename, raw_data, pk):
         destination_address = Utils.address_to_md5(destination_address)
         return Layer3(
-            Layer4(Layer5(encrypt_file(filename + '\00' + raw_data, pk).encode(), L5_FILE), L4_DATA, True, True, 1, 2, 3),
-            # b'aaaaaaaaaaaaaaaa',
-            # b'dddddddddddddddd',
+            Layer4(Layer5((filename + '\00' + encrypt_file(raw_data, pk)).encode(), L5_FILE), L4_DATA, True, True, 1, 2, 3),
             bytes.fromhex(source_address),
             bytes.fromhex(destination_address),
             7,
