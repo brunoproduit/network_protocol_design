@@ -2,8 +2,7 @@ import socket
 
 from constants import *
 from utils import *
-from globals import router
-
+from globals import router, unconfirmed_message_queue
 
 class Command:
     # executes a command based on type and payload
@@ -43,6 +42,9 @@ class Command:
 
     @staticmethod
     def handle_send_message(l3_message):
+
+        Command.handle_confirmation(l3_message)
+
         global router
         if l3_message.destination.hex() == BROADCAST_ADDRESS:
             for neighbor in router.neighbors:
@@ -55,3 +57,11 @@ class Command:
                 Command.send_message(l3_message, ip_address)
             else:
                 print(l3_message.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
+
+
+    @staticmethod
+    def handle_confirmation(l3_message):
+        # Acknowledgement of messages
+        if (l3_message.type != L3_CONFIRMATION):
+            global unconfirmed_message_queue
+            unconfirmed_message_queue.append(l3_message)

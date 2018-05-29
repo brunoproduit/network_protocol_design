@@ -5,9 +5,9 @@
 import readline
 from argparse import ArgumentParser
 
-from backgroundprocesses import *
-from command import *
 from messageFactory import *
+from backgroundprocesses import *
+
 
 class UserInterface:
     def __init__(self):
