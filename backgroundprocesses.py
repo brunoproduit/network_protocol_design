@@ -1,25 +1,20 @@
-import multiprocessing
 import select
 import socket
 import threading
 
+from globals import unconfirmed_message_queue
 from command import Command
 from constants import *
 from crypto import *
 from layer3 import *
 from layer4 import *
 from layer5 import *
-from globals import unconfirmed_message_queue
-
-# Thread instead of process
 from messageFactory import MessageFactory
 
-# threading.Thread
+
 class BackgroundListener(threading.Thread):
-# class BackgroundListener(multiprocessing.Process):
 
     def __init__(self, address, port, sk):
-        # multiprocessing.Process.__init__(self)
         threading.Thread.__init__(self)
         self.address = address
         self.port = port
@@ -44,9 +39,6 @@ class BackgroundListener(threading.Thread):
                     if l3_data.type != L3_CONFIRMATION:
                         ack = MessageFactory.createACK(l3_data.destination, l3_data.source, l3_data.packet_number)
                         Command.execute(SEND_MESSAGE_COMMAND, ack)  # confirm incoming message immediately
-                        # global unconfirmed_message_queue
-                        # unconfirmed_message_queue.append(l3_data)
-
 
                     if(l3_data.payload != b''):
                         l4_data = l3_data.payload
@@ -58,7 +50,6 @@ class BackgroundListener(threading.Thread):
 
                         global unconfirmed_message_queue
                         del unconfirmed_message_queue[l3_data.confirmation_id]
-                        # unconfirmed_message_queue.remove(l3_data)  # TODO: maybe rather remove it by a dictionary!
                         print('LOG: Confirmation of the message: ', l3_data.confirmation_id)
                     elif l5_data.type.encode() == L5_MESSAGE:
                         data = decrypt(l5_data.payload, self.sk)

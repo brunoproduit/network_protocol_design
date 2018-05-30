@@ -1,8 +1,13 @@
-import socket
+import threading
+import time
 
-from constants import *
 from utils import *
+from crypto import decrypt
 from globals import router, unconfirmed_message_queue
+
+from acknowledgement_thread import ConfirmMessageThread
+
+
 
 class Command:
     # executes a command based on type and payload
@@ -41,9 +46,10 @@ class Command:
             print(e, 'Terminating server ...')
 
     @staticmethod
-    def handle_send_message(l3_message):
+    def handle_send_message(l3_message, skipConfirmation = False):
 
-        Command.handle_confirmation(l3_message)
+        if not skipConfirmation:
+            Command.handle_confirmation(l3_message)
 
         global router
         if l3_message.destination.hex() == BROADCAST_ADDRESS:
@@ -64,4 +70,28 @@ class Command:
         # Acknowledgement of messages
         if (l3_message.type != L3_CONFIRMATION):
             global unconfirmed_message_queue
-            unconfirmed_message_queue[l3_message.packet_number] = l3_message
+            unconfirmed_message_queue[l3_message.packet_number] = l3_message  # second param is tries
+
+            thread = threading.Thread(target=Command.confirm_message_run, args=(l3_message,))
+            thread.daemon = True  # Daemonize thread
+            thread.start()
+
+
+    @staticmethod
+    def confirm_message_run(l3_message):
+        i = 0
+        acked = False
+        while i <= 15:
+            time.sleep(2)  # 2 seconds
+
+            if l3_message.packet_number in unconfirmed_message_queue:
+                print('LOG: Resending Message', l3_message.payload.payload.payload, ',', i, 'times already tried')
+                # Command.execute(SEND_MESSAGE_COMMAND, l3_message)
+                Command.handle_send_message(l3_message, True)
+            else:
+                acked = True
+                break
+            i += 1
+        if not acked:
+            print('LOG: Neighbor', l3_message.destination,
+                  'not responding - you might consider removing the neighbor from list!')

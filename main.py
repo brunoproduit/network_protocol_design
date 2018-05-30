@@ -105,8 +105,11 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
 
 
-    parser.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
                          this can be used to create a fresh key pair', type=str, default=None)
+    group.add_argument('-k§', '--keypath', help='Public key file to use', type=str,
+                        default=SOURCEKEYPATH)
     
     args = parser.parse_args()
 
@@ -114,6 +117,11 @@ if __name__ == '__main__':
         source_address = Utils.address_to_md5("max@mustermann.ee")
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
+        write_key_to_file(sk, pk)
+
+    elif args.keypath:
+        pk = read_key_from_file(args.keypath+'/pubkey.pem')[0]
+        sk = read_key_from_file(args.keypath+'/privkey.pem')[0]
 
     
     utils = Utils()
