@@ -38,7 +38,7 @@ class UserInterface:
     def main_loop(self):
         commandType = 'empty'
         while commandType != QUIT_COMMAND:
-            commandInput = input('')
+            commandInput = input('chat$ ')
             commandType, payload = self.recognize_command(commandInput)
             Command.execute(commandType, payload)
 
@@ -94,7 +94,7 @@ class UserInterface:
             return HELP_COMMAND, None
 
     def display_seperator(self):
-        print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
 
 # Main, Program entry, arg parsing
@@ -102,13 +102,12 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
 
-
-    parser.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
-                         this can be used to create a fresh key pair', type=str, default=None)
+    parser.add_argument('-c', '--createkey', help='This can be used to create a fresh key pair',\
+            nargs='?', default="create")
     
     args = parser.parse_args()
 
-    if args.createkey:
+    if args.createkey!="create":
         source_address = Utils.address_to_md5("max@mustermann.ee")
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
