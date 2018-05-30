@@ -17,7 +17,7 @@ class Utils:
          else:
             return False
 
-
+    @staticmethod
     def read_neighbors_from_neighborfile():
         with open(NEIGHBORSFILE) as fn:
             line = fn.readline().rstrip()
@@ -98,13 +98,6 @@ class Utils:
             s = chr(i & 0xff) + s
             i >>= 8
         return s
-
-    @staticmethod
-    def bytes_to_int(bytes):
-        result = 0
-        for byte in bytes:
-            result += result * 256 + int(byte)
-        return result
 
     @staticmethod
     def hex_decode(bytes_in):

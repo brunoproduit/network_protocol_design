@@ -1,6 +1,7 @@
 import multiprocessing
 import select
 import socket
+import threading
 
 from command import Command
 from constants import *
@@ -13,11 +14,13 @@ from globals import unconfirmed_message_queue
 # Thread instead of process
 from messageFactory import MessageFactory
 
-
-class BackgroundListener(multiprocessing.Process):
+# threading.Thread
+class BackgroundListener(threading.Thread):
+# class BackgroundListener(multiprocessing.Process):
 
     def __init__(self, address, port, sk):
-        multiprocessing.Process.__init__(self)
+        # multiprocessing.Process.__init__(self)
+        threading.Thread.__init__(self)
         self.address = address
         self.port = port
         self.sk = sk  # should be global as well I guess!
@@ -53,9 +56,10 @@ class BackgroundListener(multiprocessing.Process):
                     if l3_data.type == L3_CONFIRMATION:
                         # not working because it's a new process and no thread.
 
-                        # global unconfirmed_message_queue
+                        global unconfirmed_message_queue
+                        del unconfirmed_message_queue[l3_data.confirmation_id]
                         # unconfirmed_message_queue.remove(l3_data)  # TODO: maybe rather remove it by a dictionary!
-                        print('Confirmation of the message: ', l3_data.packet_number)
+                        print('LOG: Confirmation of the message: ', l3_data.confirmation_id)
                     elif l5_data.type.encode() == L5_MESSAGE:
                         data = decrypt(l5_data.payload, self.sk)
                         print(l3_data.source, ': ', data)

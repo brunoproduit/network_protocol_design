@@ -46,8 +46,8 @@ class Layer4:
                 encrypted=packet[0] & L4_ENCRYPTED,
                 chunked=packet[0] & L4_CHUNKED,
                 status=packet[1],
-                stream_id=Utils.bytes_to_int(packet[2:5]),
-                chunk_id=Utils.bytes_to_int(packet[5:13]),
+                stream_id=int.from_bytes(packet[2:5], byteorder='big'),
+                chunk_id=int.from_bytes(packet[5:13], byteorder='big'),
             )
         elif packet[0] & L4_ROUTINGFULL:
             return Layer4(

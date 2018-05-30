@@ -36,7 +36,7 @@ class Layer3:
                 source=packet[8:24].hex(),
                 destination=packet[24:40].hex(),
                 ttl=packet[4],
-                packet=Utils.bytes_to_int(packet[1:2]),
+                packet=int.from_bytes(packet[1:3], byteorder='big'),
                 data=Layer4.parse_l4(packet[40:]),
             )
         elif packet[3] == L3_CONFIRMATION:
@@ -45,5 +45,5 @@ class Layer3:
                 source=packet[8:24].hex(),
                 destination=packet[24:40].hex(),
                 ttl=packet[4],
-                confirmation=Utils.bytes_to_int(packet[5:6])
+                confirmation=int.from_bytes(packet[5:7], byteorder='big')
             )

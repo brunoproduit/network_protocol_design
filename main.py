@@ -29,6 +29,8 @@ class UserInterface:
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
         self.display_seperator()
 
+        self.routinglistener.setDaemon(True)  # router is listening now
+        self.messagelistener.setDaemon(True)  # also messages will be displayed now!
         self.routinglistener.start()  # router is listening now
         self.messagelistener.start()  # also messages will be displayed now!
 
@@ -42,8 +44,8 @@ class UserInterface:
             commandType, payload = self.recognize_command(commandInput)
             Command.execute(commandType, payload)
 
-        self.routinglistener.terminate()
-        self.messagelistener.terminate()
+        self.routinglistener.join()
+        self.messagelistener.join()
         print("cya next time!!")
 
     # recognizes the command and returns it's type and payload

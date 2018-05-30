@@ -64,4 +64,4 @@ class Command:
         # Acknowledgement of messages
         if (l3_message.type != L3_CONFIRMATION):
             global unconfirmed_message_queue
-            unconfirmed_message_queue.append(l3_message)
+            unconfirmed_message_queue[l3_message.packet_number] = l3_message

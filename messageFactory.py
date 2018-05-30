@@ -21,7 +21,7 @@ class MessageFactory:
                 L4_DATA, True, True, 1, 2, 3),
             bytes.fromhex(source_address),
             bytes.fromhex(destination_address),
-            7,
+            get_next_packet_number(),
             packet_type=L3_DATA)
 
 
@@ -35,7 +35,7 @@ class MessageFactory:
             Layer4(Layer5((filename + '\00' + encrypt_file(raw_data, pk)).encode(), L5_FILE), L4_DATA, True, True, 1, 2, 3),
             bytes.fromhex(source_address),
             bytes.fromhex(destination_address),
-            7,
+            get_next_packet_number(),
             packet_type=L3_DATA)
 
     # forms a basic ACK message out of src, dest and pk

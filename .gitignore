@@ -106,3 +106,6 @@ ENV/
 
 # ini
 settings.ini
+
+# exclude keys folder
+/keys
