@@ -106,6 +106,10 @@ class Utils:
             s += "%0.2X" % b
         return s
 
+    @staticmethod
+    def print_new_chat_line(output):
+        print(output, '\nchat$')
+
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
 # # write_file("test.txt", "..", b"Test!")

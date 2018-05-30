@@ -5,9 +5,6 @@ from utils import *
 from crypto import decrypt
 from globals import router, unconfirmed_message_queue
 
-from acknowledgement_thread import ConfirmMessageThread
-
-
 
 class Command:
     # executes a command based on type and payload
@@ -87,12 +84,11 @@ class Command:
 
             if l3_message.packet_number in unconfirmed_message_queue:
                 print('LOG: Resending Message', l3_message.payload.payload.payload, ',', i, 'times already tried')
-                # Command.execute(SEND_MESSAGE_COMMAND, l3_message)
                 Command.handle_send_message(l3_message, True)
             else:
                 acked = True
                 break
             i += 1
         if not acked:
-            print('LOG: Neighbor', l3_message.destination,
+            print('LOG: Neighbor', l3_message.destination.hex(),
                   'not responding - you might consider removing the neighbor from list!')
