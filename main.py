@@ -17,8 +17,6 @@ class UserInterface:
         self.stream_mgr = StreamManager(pk)
 
     def __del__(self):
-        self.routinglistener.join()  # HOWTO terminate a thread using python? -> thread.join()
-        self.messagelistener.join()  # HOWTO terminate a thread using python? -> thread.join()
         self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
@@ -124,4 +122,4 @@ if __name__ == '__main__':
     ui.enable_history()
     ui.startup()
     ui.main_loop()
-    del ui
+    del(ui)

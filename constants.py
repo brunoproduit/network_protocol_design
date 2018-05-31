@@ -61,5 +61,10 @@ L4_ENCRYPTED = 8
 L3_DATA = 0x02
 L3_CONFIRMATION = 0x04
 
+# Message Status ------------------------------------------------------------
+MSG_NOTREADY = 1
+MSG_READY = 2
+MSG_TIMEOUT = 4
+
 # Globals -------------------------------------------------------------------
 source_address = 'f'*32

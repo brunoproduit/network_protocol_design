@@ -19,7 +19,6 @@ class ThreadedSender:
         thread.start()
 
     def run(self):
-        print("sender spawned...")
         global router
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         address_tuple = router.get_next_hop(self.l3_data.destination.hex())
@@ -94,11 +93,10 @@ class StreamManager:
                 packet_type=L3_DATA)
 
             # Debug
-            print(chunk, ' ', stream_id, ' ', chunk_id, ' ', stop_bit)
+            # print(chunk, ' ', stream_id, ' ', chunk_id, ' ', stop_bit)
 
             chunk_id += 1
             ThreadedSender(l3_packet)
-            
 
 
 # Assembles single stream from incoming packets.
@@ -131,19 +129,33 @@ class PacketAccumulator:
 
         if l5_data.type.encode() == L5_MESSAGE:
             self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
-            print("MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")")
+            # Debug
+            # print("MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")")
         elif l5_data.type.encode() == L5_FILE:
             print("FilePart ", l4_data.chunk_id)
+            # TODO: Files
         else:
             print("Invalid packet type")
 
         # TODO: Send ACK
 
     def check(self):
-        if self.finished and datetime.now() > self.finished_time + timedelta(0, 20):
-            for key, value in self.data.items():
-                print(key, " ", value)
-        # TODO: Check
+        if self.finished:             
+            # Check integrity
+            combined_data = '' # TODO: File also!
+            start_id = -1
+            for key, value in sorted(self.data.items()):
+                if key - start_id != 1:
+                    if datetime.now() > self.finished_time + timedelta(0, 20):
+                        return MSG_NOTREADY
+                    # else:
+                    #    print("Packet receving timed out...")
+                    #    return MSG_TIMEOUT
+                
+                combined_data += value
+            print(combined_data)
+            return MSG_READY
+        return MSG_NOTREADY
 
 
 # Incoming stream manager.
@@ -174,5 +186,7 @@ class MessageAggregator:
 
     # Check all the accumulators and see if any of them are ready.
     def print_ready(self):
-        # TODO:
-        print("TODO")
+        for a in self.accumulators:
+            state = a.check()
+            if state == MSG_READY or state == MSG_TIMEOUT:
+                self.accumulators.remove(a)
