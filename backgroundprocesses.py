@@ -9,7 +9,7 @@ from layer4 import *
 from layer5 import *
 
 # Thread instead of process
-from messageFactory import MessageFactory
+from packetEngine import PacketAccumulator, MessageAggregator
 
 
 class BackgroundListener(multiprocessing.Process):
@@ -26,38 +26,18 @@ class BackgroundListener(multiprocessing.Process):
         s.setblocking(0)
         s.bind((self.address, self.port))
 
+        msg_aggregator = MessageAggregator(self.sk)
 
         # Receive loop
         while True:
-            # try:
+            try:
                 ready = select.select([s], [], [], 1)
                 if ready[0]:
                     data, addr = s.recvfrom(1024)
-                    l3_data = Layer3.parse_l3(data)
-
-                    l4_data = l3_data.payload
-                    l5_data = l3_data.payload.payload
-
-                    # TODO: select source-keys from directory or something
-
-                    if l5_data.type.encode() == L5_MESSAGE:
-                        data = decrypt(l5_data.payload, self.sk)
-                        print(l3_data.source, ': ', data)
-                        MessageFactory.createACK()
-                    elif l5_data.type.encode() == L5_FILE:
-                        Utils.write_file('download.tmp', '.', l5_data.payload)
-                        data = decrypt_file('download.tmp', self.sk)  # not working appearently
-                        # file_name = l3_data.source.split('\x00', 1)[0]
-                        # file_data = l3_data.source.split('\x00', 1)[1]
-                        file_data = l3_data
-                        # print(l3_data.source, ': sent you a file;', file_name)
-                        # Utils.write_file(file_name, '.', file_data.encode())
-
-                    else:
-                        print(l3_data.source, ": sent you something I can't handle")
-                        print(l3_data.source, ':', data)
-            # except Exception:
-            #     print('Something went wrong..')
+                    msg_aggregator.feed_packet(data)
+                    msg_aggregator.print_ready()
+            except Exception as e:
+                print("Exception in listener: ", e)
         s.close()
         print ('Closed the server socket')
         print ('Terminating ...')
