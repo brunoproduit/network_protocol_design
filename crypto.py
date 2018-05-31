@@ -13,7 +13,7 @@ def create_pgpkey(name, email):
     key.add_uid(uid, usage={KeyFlags.Sign, KeyFlags.EncryptCommunications, KeyFlags.EncryptStorage},
             hashes=[HashAlgorithm.SHA512],
             ciphers=[SymmetricKeyAlgorithm.AES128],
-            compression=None)
+            compression= CompressionAlgorithm.Uncompressed)
     return key, key.pubkey
 
 # Writes new RSA PGPkeys to file
@@ -48,13 +48,13 @@ def read_key_from_file(filename):
 # @param: m string
 # @return: pgp_m PGPMessage
 def create_pgp_message(m):
-    return pgpy.PGPMessage.new(m, encoding="UTF8")
+    return pgpy.PGPMessage.new(m, encoding="UTF8", compression=CompressionAlgorithm.Uncompressed)
 
 # Create PGPMessage from file
 # @param: filename string
 # @return: pgp_m PGPMessage
 def create_pgp_message_from_file(filename):
-    return pgpy.PGPMessage.new(filename, file=True)
+    return pgpy.PGPMessage.new(filename, file=True, compression=CompressionAlgorithm.Uncompressed)
 
 # Encrypt string
 # @param: m string
@@ -101,7 +101,7 @@ def verify(masterkeyfile, pkfile):
 def md5_hash(m):
     digest = hashlib.md5()
     for i in range(0, len(m), 512):
-        digest.update(m[i:i+512].encode('utf-8'))
+        digest.update(m[i:i+512])
     return digest.digest()
 
 # Verify MD5 hash
@@ -111,7 +111,7 @@ def md5_hash(m):
 def verify_md5_hash(m, h):
     digest = hashlib.md5()
     for i in range(0, len(m), 512):
-        digest.update(m[i:i+512].encode('utf-8'))
+        digest.update(m[i:i+512])
     return digest.digest() == h
 
 # Unit testing function
@@ -132,4 +132,4 @@ def unitTest():
     dec_file = decrypt_file("enc_ui", sk)
     open("dec_ui.PNG", "wb").write(dec_file)
 
-# unitTest()
+#unitTest()

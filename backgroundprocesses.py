@@ -1,21 +1,22 @@
-import multiprocessing
 import select
 import socket
+import threading
 
+from globals import unconfirmed_message_queue
 from constants import *
 from crypto import *
 from layer3 import *
 from layer4 import *
 from layer5 import *
 
-# Thread instead of process
+
 from packetEngine import PacketAccumulator, MessageAggregator
 
 
-class BackgroundListener(multiprocessing.Process):
+class BackgroundListener(threading.Thread):
 
     def __init__(self, address, port, sk):
-        multiprocessing.Process.__init__(self)
+        threading.Thread.__init__(self)
         self.address = address
         self.port = port
         self.sk = sk  # should be global as well I guess!
@@ -39,5 +40,5 @@ class BackgroundListener(multiprocessing.Process):
             except Exception as e:
                 print("Exception in listener: ", e)
         s.close()
-        print ('Closed the server socket')
-        print ('Terminating ...')
+        print('Closed the server socket')
+        print('Terminating ...')

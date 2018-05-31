@@ -6,6 +6,7 @@ import os
 import readline
 from argparse import ArgumentParser
 
+
 from backgroundprocesses import *
 from packetEngine import StreamManager
 
@@ -16,8 +17,8 @@ class UserInterface:
         self.stream_mgr = StreamManager(pk)
 
     def __del__(self):
-        self.routinglistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
-        self.messagelistener.terminate() # HOWTO terminate a thread using python? -> thread.join()
+        self.routinglistener.join()  # HOWTO terminate a thread using python? -> thread.join()
+        self.messagelistener.join()  # HOWTO terminate a thread using python? -> thread.join()
         self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
@@ -36,6 +37,8 @@ class UserInterface:
         print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
         self.display_seperator()
 
+        self.routinglistener.setDaemon(True)  # router is listening now
+        self.messagelistener.setDaemon(True)  # also messages will be displayed now!
         self.routinglistener.start()  # router is listening now
         self.messagelistener.start()  # also messages will be displayed now!
 
@@ -45,8 +48,8 @@ class UserInterface:
     def main_loop(self):
         is_quit = 0
         while is_quit != 1:
-            commandInput = input('')
-            is_quit = self.execute_command(commandInput)
+            command_input = input('chat$ ')
+            is_quit = self.execute_command(command_input)
 
     # recognizes the command and returns it's type and payload
     def execute_command(self, input):
@@ -64,6 +67,7 @@ class UserInterface:
 
             if len(detail_command_parts) == 2:
                 destination_address = detail_command_parts[0].lower()
+
                 if not Utils.valid_destination(destination_address):
                     print("Address seems to be invalid, double-check your input after the @-sign")
                     return 0
@@ -97,7 +101,7 @@ class UserInterface:
             return 0
 
     def display_seperator(self):
-        print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
 
 # Main, Program entry, arg parsing
@@ -105,21 +109,19 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
 
-
-    parser.add_argument('-c', '--createkey', help='If no key is given with --pubkey, \
-                         this can be used to create a fresh key pair', type=str, default=None)
+    parser.add_argument('-c', '--createkey', help='This can be used to create a fresh key pair',
+        nargs='?', default="create")
     
     args = parser.parse_args()
 
-    if args.createkey:
+    if args.createkey != "create":
         source_address = "max@mustermann.ee"
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
 
-    
     utils = Utils()
     ui = UserInterface()
     ui.enable_history()
     ui.startup()
     ui.main_loop()
-    del(ui)
+    del ui

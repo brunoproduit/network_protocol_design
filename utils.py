@@ -17,7 +17,7 @@ class Utils:
          else:
             return False
 
-
+    @staticmethod
     def read_neighbors_from_neighborfile():
         with open(NEIGHBORSFILE) as fn:
             line = fn.readline().rstrip()
@@ -100,18 +100,15 @@ class Utils:
         return s
 
     @staticmethod
-    def bytes_to_int(bytes):
-        result = 0
-        for byte in bytes:
-            result += result * 256 + int(byte)
-        return result
-
-    @staticmethod
     def hex_decode(bytes_in):
         s = ''
         for b in bytes_in:
             s += "%0.2X" % b
         return s
+
+    @staticmethod
+    def print_new_chat_line(output):
+        print(output, '\nchat$')
 
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)

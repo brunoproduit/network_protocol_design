@@ -1,9 +1,3 @@
-#TODO: ACKing of Messages --> Into the backgroundprocesses.py (Listener)
-
-#TODO: Router (it's not really working for me) --> Touple
-
-#TODO: Format/Decoding of the MD5 Addresses --> Other group
-
 #TODO: Sending and encrypting files --> Last piece
 
 #TODO: Chunking --> Started
