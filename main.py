@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 
 from backgroundprocesses import *
 from packetEngine import StreamManager
+from utils import *
 
 class UserInterface:
     def __init__(self):
@@ -46,7 +47,7 @@ class UserInterface:
     def main_loop(self):
         is_quit = 0
         while is_quit != 1:
-            command_input = input('chat$ ')
+            command_input = input('')
             is_quit = self.execute_command(command_input)
 
     # recognizes the command and returns it's type and payload

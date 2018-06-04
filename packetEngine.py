@@ -2,7 +2,7 @@ from layer3 import *
 from layer4 import *
 from layer5 import *
 from crypto import *
-from globals import router
+from globals import router, get_next_packet_number, unconfirmed_message_queue
 from datetime import datetime, timedelta
 import time
 from constants import *
@@ -22,22 +22,37 @@ class ThreadedSender:
         global router
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         address_tuple = router.get_next_hop(self.l3_data.destination.hex())
+        global unconfirmed_message_queue
 
         if address_tuple is not None:
             ip_address = address_tuple[1]
             s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
             try:
                 s.sendall(bytes(self.l3_data))
+                unconfirmed_message_queue[self.l3_data.packet_number] = self.l3_data  # TODO: Redundant, store ID only.
             except Exception as e:
-                print(e, 'Terminating server ...')
+                print('Exception sending packet...', e)
         else:
             print(self.l3_data.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
             return
 
-        # while True:
-            # Wait for the ACK here.
-            # TODO: wait for ACK, resend if none
-            # time.sleep()
+        tries = 0
+        while tries < SEND_RETRIES:
+            time.sleep(ACK_TIMEOUT)
+            if self.l3_data.packet_number in unconfirmed_message_queue:
+                # Debug
+                # print("Packet unconfirmed", self.l3_data.packet_number, "re-send!")
+                tries += 1
+                try:
+                    s.sendall(bytes(self.l3_data))
+                except Exception as e:
+                    print('Exception re-sending packet...', e)
+            else:
+                # Debug
+                # print("Confirmed by sender", self.l3_data.packet_number)
+                return
+        
+        print("Error: Packet not delivered", self.l3_data.packet_number)
 
 # Outgoing stream manager.
 class StreamManager:
@@ -54,12 +69,13 @@ class StreamManager:
         return self.current_id
 
     def add_stream(self, source, destination, data, is_file=False, file_name=""):
+        if is_file:
+            data = file_name + '\00' + encrypt_file(data, self.pk)
+
         size = len(data)
         index = 0
         chunk_id = 0
         stream_id = self.get_next_stream_id()
-
-        print("Size: ", size)
         
         while index < size:
             stop_bit = False
@@ -79,7 +95,7 @@ class StreamManager:
             l3_packet = Layer3(
                 Layer4(
                     Layer5(
-                        encrypt(chunk, self.pk).encode() if not is_file else encrypt_file(file_name + '\00' + chunk, self.pk).encode(), 
+                        encrypt(chunk, self.pk).encode(),
                         L5_MESSAGE if not is_file else L5_FILE),
                     L4_DATA, 
                     True,
@@ -89,7 +105,7 @@ class StreamManager:
                     chunk_id),
                 bytes.fromhex(source_address),
                 bytes.fromhex(destination_address),
-                0, #  TODO: Packet number?
+                get_next_packet_number(),
                 packet_type=L3_DATA)
 
             # Debug
@@ -107,6 +123,8 @@ class PacketAccumulator:
         self.stream_id = 0
         self.data = {}
         self.sk = sk
+        self.sender = ""
+        self.is_file = False
 
     def accumulate(self, raw_data):
         try:
@@ -119,6 +137,8 @@ class PacketAccumulator:
 
         if self.stream_id == 0:
             self.stream_id = l4_data.stream_id
+            self.sender = l3_data.source
+            self.is_file = False if l5_data.type.encode() == L5_MESSAGE else True
         elif self.stream_id != l4_data.stream_id:
             print("Wrong stream ID!")
             return
@@ -132,12 +152,33 @@ class PacketAccumulator:
             # Debug
             # print("MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")")
         elif l5_data.type.encode() == L5_FILE:
-            print("FilePart ", l4_data.chunk_id)
-            # TODO: Files
+            self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
+            # Debug
+            # print("FilePart ", l3_data.source, " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")")
         else:
             print("Invalid packet type")
 
-        # TODO: Send ACK
+        # Send ACK.
+        ack_message = Layer3(
+            Layer4(Layer5(b''), L4_DATA),
+            bytes.fromhex(l3_data.destination),
+            bytes.fromhex(l3_data.source),
+            get_next_packet_number(),
+            15, 
+            L3_CONFIRMATION, 
+            l3_data.packet_number)
+
+        global router
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        address_tuple = router.get_next_hop(ack_message.destination.hex())
+
+        if address_tuple is not None:
+            ip_address = address_tuple[1]
+            s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
+            try:
+                s.sendall(bytes(ack_message))
+            except Exception as e:
+                print('Exception sending ACK packet...', e)
 
     def check(self):
         if self.finished:             
@@ -153,7 +194,13 @@ class PacketAccumulator:
                     #    return MSG_TIMEOUT
                 
                 combined_data += value
-            print(combined_data)
+
+            if not self.is_file:
+                print(self.sender, ": ", combined_data)  # TODO: Print sender.
+            else:
+                file_name = combined_data[0:combined_data.find('\00')]
+                print(self.sender, " sent file '", file_name, "'")
+                Utils.write_file(file_name, '.', decrypt(combined_data[combined_data.find('\00')+1:], self.sk).encode())
             return MSG_READY
         return MSG_NOTREADY
 
@@ -167,12 +214,23 @@ class MessageAggregator:
     # Feed a random packet to aggregator.
     def feed_packet(self, packet):
         try:
-            stream_id = Layer3.parse_l3(packet).payload.stream_id
+            l3_data = Layer3.parse_l3(packet)
         except Exception as e:
             print(e)
             return
-        
-        self.insert(stream_id, packet)
+
+        try:
+            if l3_data.type == L3_CONFIRMATION:
+                global unconfirmed_message_queue
+                del unconfirmed_message_queue[l3_data.confirmation_id]
+                # Debug
+                # print("Confirmed by receiver ", l3_data.confirmation_id)
+                return
+            
+            stream_id = l3_data.payload.stream_id
+            self.insert(stream_id, packet)
+        except Exception as e:
+            print("Failed to feed a packet", e)
 
     def insert(self, stream, packet):
         for accumulator in self.accumulators:

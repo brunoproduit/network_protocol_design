@@ -2,12 +2,8 @@ import select
 import socket
 import threading
 
-from globals import unconfirmed_message_queue
 from constants import *
 from crypto import *
-from layer3 import *
-from layer4 import *
-from layer5 import *
 
 
 from packetEngine import PacketAccumulator, MessageAggregator
@@ -36,7 +32,9 @@ class BackgroundListener(threading.Thread):
                 if ready[0]:
                     data, addr = s.recvfrom(1024)
                     msg_aggregator.feed_packet(data)
-                    msg_aggregator.print_ready()
+                
+                # Print any finalized messages.
+                msg_aggregator.print_ready()
             except Exception as e:
                 print("Exception in listener: ", e)
         s.close()

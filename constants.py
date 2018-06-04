@@ -14,7 +14,7 @@ PORT = 1338                             # Default UDP port, can be changed in ar
 INET_ADDR = '127.0.0.1'                 # Default IP, can be changed in arg
 UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
 MAX_PDU_SIZE = 10                      # Maximum PDU for communication
-ACK_TIMEOUT = 5                         # ACK timewait waiting in seconds
+ACK_TIMEOUT = 5                        # ACK timewait waiting in seconds
 SEND_RETRIES = 3                        # Times to retry if send is unsuccessful
 
 #Protocol -------------------------------------------------------------------------
