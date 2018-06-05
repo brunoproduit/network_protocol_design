@@ -2,17 +2,24 @@
 # -*- coding: utf-8 -*-
 
 # Libraries
+import os
 import readline
 from argparse import ArgumentParser
 
-from messageFactory import *
-from backgroundprocesses import *
 
+from backgroundprocesses import *
+from packetEngine import StreamManager
+from utils import *
 
 class UserInterface:
     def __init__(self):
         self.routinglistener = BackgroundListener('0.0.0.0', ROUTER_PORT, sk)
         self.messagelistener = BackgroundListener('0.0.0.0', PORT, sk)
+        self.stream_mgr = StreamManager(pk)
+
+    def __del__(self):
+        self.routinglistener.quit = True # file that tells if its readable
+        print("cya next time!!")
 
     def enable_history(self):
         # tab completion
@@ -38,22 +45,18 @@ class UserInterface:
 
     # main loop routine with command recognition an respond
     def main_loop(self):
-        commandType = 'empty'
-        while commandType != QUIT_COMMAND:
-            commandInput = input('chat$ ')
-            commandType, payload = self.recognize_command(commandInput)
-            Command.execute(commandType, payload)
-
-        self.routinglistener.join()
-        self.messagelistener.join()
-        print("cya next time!!")
+        is_quit = 0
+        while is_quit != 1:
+            command_input = input('')
+            is_quit = self.execute_command(command_input)
 
     # recognizes the command and returns it's type and payload
-    def recognize_command(self, input):
+    def execute_command(self, input):
         commandparts = input.split(' ', 1)
 
         if input.startswith(MD5_COMMAND + ' '):
-            return MD5_COMMAND, input[4:]
+            print(input[4:], ':', Utils.address_to_md5(input[4:]))
+            return 0
 
         if len(commandparts) > 1:
             # handle address based commands
@@ -65,35 +68,36 @@ class UserInterface:
                 destination_address = detail_command_parts[0].lower()
 
                 if not Utils.valid_destination(destination_address):
-                    return INVALID_COMMAND, "Address seems to be invalid, double-check your input after the @-sign"
-
+                    print("Address seems to be invalid, double-check your input after the @-sign")
+                    return 0
                 if detail_command_parts[1] == SEND_FILE_COMMAND:
                     file_data = Utils.read_file(payload)
                     if not file_data:
-                        return INVALID_COMMAND, "File: " + payload + ", doesn't exist, not sending anything"
+                        print("File: " + payload + ", doesn't exist, not sending anything")
+                        return 0
 
-                    payload = MessageFactory.createFileMessage(source_address, destination_address, payload, file_data, pk)
-                    return SEND_FILE_COMMAND, payload
-
+                    self.stream_mgr.add_stream(source_address, destination_address, file_data, True, payload)
+                    return 0
                 if detail_command_parts[1] == SEND_MESSAGE_COMMAND:
-                    payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
-                    return SEND_MESSAGE_COMMAND, payload
-
+                    self.stream_mgr.add_stream(source_address, destination_address, payload)
+                    return 0
                 else:
-                    return INVALID_COMMAND, "Unknown command detail, double-check your input after the :-sign"
-
+                    print("Unknown command detail, double-check your input after the :-sign")
+                    return 0
             else:
                 if not Utils.valid_destination(destination_address):
-                    return INVALID_COMMAND, "Address seems to be invalid, please doublecheck your input after the @-sign"
+                    print("Address seems to be invalid, please doublecheck your input after the @-sign")
+                    return 0
 
-                payload = MessageFactory.createTextMessage(source_address, destination_address, payload, pk)
-                return SEND_MESSAGE_COMMAND, payload
+                self.stream_mgr.add_stream(source_address, destination_address, payload)
+                return 0
 
         elif input == QUIT_COMMAND:
-            return QUIT_COMMAND, None
-
+            print ('Exiting...')
+            return 1
         else:
-            return HELP_COMMAND, None
+            print(HELP_TEXT)
+            return 0
 
     def display_seperator(self):
         print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
@@ -104,19 +108,19 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='%s by %s, version %s' % (NAME, AUTHOR, VERSION))
 
-    parser.add_argument('-c', '--createkey', help='This can be used to create a fresh key pair',\
-            nargs='?', default="create")
+    parser.add_argument('-c', '--createkey', help='This can be used to create a fresh key pair',
+        nargs='?', default="create")
     
     args = parser.parse_args()
 
-    if args.createkey!="create":
-        source_address = Utils.address_to_md5("max@mustermann.ee")
+    if args.createkey != "create":
+        source_address = "max@mustermann.ee"
         print('Source address:', source_address)
         sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
 
-    
     utils = Utils()
     ui = UserInterface()
     ui.enable_history()
     ui.startup()
     ui.main_loop()
+    del(ui)

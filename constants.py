@@ -13,7 +13,9 @@ DEVELOPMENT = True
 PORT = 1338                             # Default UDP port, can be changed in arg
 INET_ADDR = '127.0.0.1'                 # Default IP, can be changed in arg
 UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
-MAX_PDU_SIZE = 100                      # Maximum PDU for communication
+MAX_PDU_SIZE = 10                      # Maximum PDU for communication
+ACK_TIMEOUT = 5                        # ACK timewait waiting in seconds
+SEND_RETRIES = 3                        # Times to retry if send is unsuccessful
 
 #Protocol -------------------------------------------------------------------------
 ROUTER_PORT = 8999
@@ -58,6 +60,11 @@ L4_ENCRYPTED = 8
 # L3 ------------------------------------------------------------------------
 L3_DATA = 0x02
 L3_CONFIRMATION = 0x04
+
+# Message Status ------------------------------------------------------------
+MSG_NOTREADY = 1
+MSG_READY = 2
+MSG_TIMEOUT = 4
 
 # Globals -------------------------------------------------------------------
 source_address = 'f'*32

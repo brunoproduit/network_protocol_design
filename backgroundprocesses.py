@@ -2,14 +2,11 @@ import select
 import socket
 import threading
 
-from globals import unconfirmed_message_queue
-from command import Command
 from constants import *
 from crypto import *
-from layer3 import *
-from layer4 import *
-from layer5 import *
-from messageFactory import MessageFactory
+
+
+from packetEngine import PacketAccumulator, MessageAggregator
 
 
 class BackgroundListener(threading.Thread):
@@ -26,57 +23,20 @@ class BackgroundListener(threading.Thread):
         s.setblocking(0)
         s.bind((self.address, self.port))
 
+        msg_aggregator = MessageAggregator(self.sk)
 
         # Receive loop
         while True:
-            ready = select.select([s], [], [], 1)
-            if ready[0]:
-                data, addr = s.recvfrom(1024)
-                l3_data = Layer3.parse_l3(data)
-
-                # Logic for node hopping!
-                if l3_data.destination != source_address:
-                    l3_data.ttl -= 1
-                    if l3_data.ttl > 0:
-                        global router
-                        nexthop = router.get_next_hop(l3_data.destination)
-                        Command.send_message(l3_data, nexthop)
-                    else:
-                        continue
-
-                # sending ACKs
-                if l3_data.type != L3_CONFIRMATION:
-                    ack = MessageFactory.createACK(l3_data.destination, l3_data.source, l3_data.packet_number)
-                    # disable next line to test acks
-                    Command.execute(SEND_MESSAGE_COMMAND, ack)  # confirm incoming message immediately
-
-                if(l3_data.payload != b''):
-                    l4_data = l3_data.payload
-                    l5_data = l3_data.payload.payload
-
-                # receiving ACKs
-                if l3_data.type == L3_CONFIRMATION:
-                    # not working because it's a new process and no thread.
-
-                    global unconfirmed_message_queue
-
-                    if l3_data.packet_number in unconfirmed_message_queue:
-                        del unconfirmed_message_queue[l3_data.confirmation_id]
-                        Utils.print_new_chat_line('LOG: Confirmation of the message: ' + str(l3_data.confirmation_id))
-                elif l5_data.type.encode() == L5_MESSAGE:
-                    data = decrypt(l5_data.payload, self.sk)
-                    Utils.print_new_chat_line(l3_data.source + ' : ' + data)
-                elif l5_data.type.encode() == L5_FILE:
-                    data = decrypt(l5_data.payload, self.sk)
-                    Utils.print_new_chat_line(l3_data.source + ' : ' + data)
-                    Utils.write_file('download.tmp', '.', data.encode())
-                    # data = decrypt_file('download.tmp', self.sk)  # not working appearently
-                    # file_name = l3_data.source.split('\x00', 1)[0]
-                    # file_data = l3_data.source.split('\x00', 1)[1]
-                    # file_data = l3_data
-                    # print(l3_data.source, ': sent you a file;', file_name)
-                    # Utils.write_file(file_name, '.', file_data.encode())
-                else:
-                    # print('\n', l3_data.source + "$: sent you something I can't handle\n chat$ ")
-                    # print(l3_data.source, ':', data)
-                    Utils.print_new_chat_line(l3_data.source + "$: sent you something I can't handle")
+            try:
+                ready = select.select([s], [], [], 1)
+                if ready[0]:
+                    data, addr = s.recvfrom(1024)
+                    msg_aggregator.feed_packet(data)
+                
+                # Print any finalized messages.
+                msg_aggregator.print_ready()
+            except Exception as e:
+                print("Exception in listener: ", e)
+        s.close()
+        print('Closed the server socket')
+        print('Terminating ...')
