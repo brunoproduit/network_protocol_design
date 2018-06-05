@@ -34,6 +34,16 @@ class BackgroundListener(threading.Thread):
                 data, addr = s.recvfrom(1024)
                 l3_data = Layer3.parse_l3(data)
 
+                # Logic for node hopping!
+                if l3_data.destination != source_address:
+                    l3_data.ttl -= 1
+                    if l3_data.ttl > 0:
+                        global router
+                        nexthop = router.get_next_hop(l3_data.destination)
+                        Command.send_message(l3_data, nexthop)
+                    else:
+                        continue
+
                 # sending ACKs
                 if l3_data.type != L3_CONFIRMATION:
                     ack = MessageFactory.createACK(l3_data.destination, l3_data.source, l3_data.packet_number)
@@ -49,8 +59,10 @@ class BackgroundListener(threading.Thread):
                     # not working because it's a new process and no thread.
 
                     global unconfirmed_message_queue
-                    del unconfirmed_message_queue[l3_data.confirmation_id]
-                    Utils.print_new_chat_line('LOG: Confirmation of the message: ' + str(l3_data.confirmation_id))
+
+                    if l3_data.packet_number in unconfirmed_message_queue:
+                        del unconfirmed_message_queue[l3_data.confirmation_id]
+                        Utils.print_new_chat_line('LOG: Confirmation of the message: ' + str(l3_data.confirmation_id))
                 elif l5_data.type.encode() == L5_MESSAGE:
                     data = decrypt(l5_data.payload, self.sk)
                     Utils.print_new_chat_line(l3_data.source + ' : ' + data)

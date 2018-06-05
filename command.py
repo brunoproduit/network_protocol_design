@@ -52,7 +52,7 @@ class Command:
         if l3_message.destination.hex() == BROADCAST_ADDRESS:
             for neighbor in router.neighbors:
                 Command.send_message(l3_message, neighbor[1])  # [0] = md5, [1] = ip
-            raise NotImplementedError('Broadcast needs to be finished')
+        #         TODO: add logic when a broadcast message is received
         else:
             address_tuple = router.get_next_hop(l3_message.destination.hex())
             if address_tuple is not None:
