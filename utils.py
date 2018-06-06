@@ -110,6 +110,14 @@ class Utils:
     def print_new_chat_line(output):
         print(output, '\nchat$')
 
+    @staticmethod
+    def dbg_log(message_list):
+        if DEBUG:
+            msg = ''
+            for item in message_list:
+                msg += str(item)
+            print(msg)
+
 # utils = Utils()
 # pgpsettings = PGPSettings(MASTERKEYPATH, SOURCEKEYPATH)
 # # write_file("test.txt", "..", b"Test!")

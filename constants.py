@@ -8,14 +8,15 @@ NAME = 'Network protocol design chat '                                          
 AUTHOR = 'Sander Mikelsaar, Sasan Reyaeifars, Florian Reiter, Bruno Produit, Pavel Chikul'    # Author of program
 VERSION = '1.0'                                                                               # Version of program
 DEVELOPMENT = True
+DEBUG = False
 
 # UDP -----------------------------------------------------------------------------
 PORT = 1338                             # Default UDP port, can be changed in arg
 INET_ADDR = '127.0.0.1'                 # Default IP, can be changed in arg
 UDP_RECEIVE_BUFFER_SIZE = 1024*1024     # Maximum buffer for receiving
-MAX_PDU_SIZE = 10                      # Maximum PDU for communication
+MAX_PDU_SIZE = 100                      # Maximum PDU for communication
 ACK_TIMEOUT = 5                        # ACK timewait waiting in seconds
-SEND_RETRIES = 3                        # Times to retry if send is unsuccessful
+SEND_RETRIES = 1                        # Times to retry if send is unsuccessful
 
 #Protocol -------------------------------------------------------------------------
 ROUTER_PORT = 8999

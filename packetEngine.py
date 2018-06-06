@@ -2,10 +2,11 @@ from layer3 import *
 from layer4 import *
 from layer5 import *
 from crypto import *
-from globals import router, get_next_packet_number, unconfirmed_message_queue
+from globals import *
 from datetime import datetime, timedelta
 import time
 from constants import *
+from utils import Utils
 import threading
 import socket
 
@@ -22,14 +23,13 @@ class ThreadedSender:
         global router
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         address_tuple = router.get_next_hop(self.l3_data.destination.hex())
-        global unconfirmed_message_queue
 
         if address_tuple is not None:
             ip_address = address_tuple[1]
             s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
             try:
                 s.sendall(bytes(self.l3_data))
-                unconfirmed_message_queue[self.l3_data.packet_number] = self.l3_data  # TODO: Redundant, store ID only.
+                add_unconfimed_message(self.l3_data)
             except Exception as e:
                 print('Exception sending packet...', e)
         else:
@@ -39,17 +39,15 @@ class ThreadedSender:
         tries = 0
         while tries < SEND_RETRIES:
             time.sleep(ACK_TIMEOUT)
-            if self.l3_data.packet_number in unconfirmed_message_queue:
-                # Debug
-                # print("Packet unconfirmed", self.l3_data.packet_number, "re-send!")
+            if is_unconfimed_message(self.l3_data.packet_number):
+                Utils.dbg_log(["Packet unconfirmed ", self.l3_data.packet_number, ", re-send!"])
                 tries += 1
                 try:
                     s.sendall(bytes(self.l3_data))
                 except Exception as e:
                     print('Exception re-sending packet...', e)
             else:
-                # Debug
-                # print("Confirmed by sender", self.l3_data.packet_number)
+                Utils.dbg_log(["Confirmation received by sender ", self.l3_data.packet_number])
                 return
         
         print("Error: Packet not delivered", self.l3_data.packet_number)
@@ -108,8 +106,7 @@ class StreamManager:
                 get_next_packet_number(),
                 packet_type=L3_DATA)
 
-            # Debug
-            # print(chunk, ' ', stream_id, ' ', chunk_id, ' ', stop_bit)
+            # Utils.dbg_log([chunk, ' ', stream_id, ' ', chunk_id, ' ', stop_bit])
 
             chunk_id += 1
             ThreadedSender(l3_packet)
@@ -149,12 +146,12 @@ class PacketAccumulator:
 
         if l5_data.type.encode() == L5_MESSAGE:
             self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
-            # Debug
-            # print("MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")")
+            # Utils.dbg_log(["MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
         elif l5_data.type.encode() == L5_FILE:
             self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
-            # Debug
-            # print("FilePart ", l3_data.source, " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")")
+            Utils.dbg_log(["FilePart ", l3_data.source, 
+                " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, " packet ",
+                l3_data.packet_number, ")"])
         else:
             print("Invalid packet type")
 
@@ -221,10 +218,8 @@ class MessageAggregator:
 
         try:
             if l3_data.type == L3_CONFIRMATION:
-                global unconfirmed_message_queue
-                del unconfirmed_message_queue[l3_data.confirmation_id]
-                # Debug
-                # print("Confirmed by receiver ", l3_data.confirmation_id)
+                del_unconfimed_message(l3_data.confirmation_id)
+                Utils.dbg_log(["Confirmed by receiver ", l3_data.confirmation_id])
                 return
             
             stream_id = l3_data.payload.stream_id
