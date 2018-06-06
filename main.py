@@ -109,13 +109,27 @@ if __name__ == '__main__':
 
     parser.add_argument('-c', '--createkey', help='This can be used to create a fresh key pair',
         nargs='?', default="create")
-    
+    parser.add_argument('-n', '--name', help='Set the name of the key pair to be created',
+                        nargs='?', default="name")
+
     args = parser.parse_args()
 
-    if args.createkey != "create":
-        source_address = "max@mustermann.ee"
+    if args.createkey != "create" and args.name != "name":
+        source_address = args.createkey
         print('Source address:', source_address)
-        sk, pk = create_pgpkey("Max Mustermann", "max@mustermann.ee")
+        sk, pk = create_pgpkey(args.name, source_address)
+        write_key_to_file(sk, pk, MASTERPREFIX)
+
+    elif (args.createkey != "create") != (args.name != "name"):
+        print('Both name and create need to be set in order to create a new key pair!')
+        exit(1)
+
+    else:
+        print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
+        sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')
+        pk = read_key_from_file(MASTERPREFIX + 'pubkey.pem')
+        print('done reading keys..')
+
 
     utils = Utils()
     ui = UserInterface()

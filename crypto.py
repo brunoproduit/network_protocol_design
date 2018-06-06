@@ -21,10 +21,10 @@ def create_pgpkey(name, email):
 # pk is saved in 'pubkey.pem' in ASCII-armored pem format
 # @param: sk PGPkey
 # @param: pk PGPkey.pubkey
-def write_key_to_file(sk, pk):
+def write_key_to_file(sk, pk, fileprefix):
     # Open FD
-    privkey = open('privkey.pem', 'w')
-    pubkey = open('pubkey.pem', 'w')
+    privkey = open(fileprefix + 'privkey.pem', 'w')
+    pubkey = open(fileprefix +  'pubkey.pem', 'w')
     
     # Write the keys
     privkey.write(str(sk))

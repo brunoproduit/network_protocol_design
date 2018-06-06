@@ -23,10 +23,10 @@ TEST_MD5_SRC = 'a'*20
 BROADCAST_ADDRESS = '0' * 32
 
 # Utils ---------------------------------------------------------------------------
-SETTINGSFILE = 'settings.ini'
 NEIGHBORSFILE = 'neighbors.ini'
-MASTERKEYPATH = './keys/masterkey.pgp'
-SOURCEKEYPATH = './keys/sourcekey.pgp'
+# MASTERKEYPATH = './keys/masterkey.pgp'
+# SOURCEKEYPATH = './keys/sourcekey.pgp'
+MASTERPREFIX = './keys/master'
 MASTER_KEY_NAME = 'master_key'
 SELF_KEY_NAME = 'own_node_key'
 ALLKEYSPATH = ''
