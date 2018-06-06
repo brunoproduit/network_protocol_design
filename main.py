@@ -111,6 +111,8 @@ if __name__ == '__main__':
         nargs='?', default="create")
     parser.add_argument('-n', '--name', help='Set the name of the key pair to be created',
                         nargs='?', default="name")
+    parser.add_argument('-s', '--sourceaddr', help='Set the source address for this node',
+                        nargs='?', default="empty")
 
     args = parser.parse_args()
 
@@ -133,6 +135,9 @@ if __name__ == '__main__':
         pk = read_key_from_file(MASTERPREFIX + 'pubkey.pem')[0]
         source_address = get_email_from_key(sk)
         print('done reading keys..')
+
+    if args.sourceaddr != 'empty':
+        source_address = args.sourceaddr
 
     print('your source address is:', source_address)
 

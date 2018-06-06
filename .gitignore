@@ -107,6 +107,7 @@ ENV/
 # ini
 settings.ini
 neighbors.ini
+*.ini
 
 # exclude keys folder
 /keys
