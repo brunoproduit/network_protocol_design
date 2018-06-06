@@ -24,9 +24,10 @@ class Utils:
             neighborlist = []
 
             while line:
-                elem = line.split('=')
-                if(Utils.valid_ip(elem[1])): # We don't care about the md5 hash
-                    neighborlist.append((elem[0], elem[1]))
+                if not line.startswith(';'):
+                    elem = line.split('=')
+                    if Utils.valid_ip(elem[1]): # We don't care about the md5 hash
+                        neighborlist.append((elem[0], elem[1]))
                 line = fn.readline().rstrip()
         return neighborlist
 

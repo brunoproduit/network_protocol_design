@@ -12,8 +12,9 @@ import socket
 
 # Sends a packet and awaits for the ACK. Resends if no ACK.
 class ThreadedSender:
-    def __init__(self, l3_data):
+    def __init__(self, l3_data, broadcast_address = None):
         self.l3_data = l3_data
+        self.broadcast_address = broadcast_address
         thread = threading.Thread(target=self.run, args=())
         thread.daemon = True
         thread.start()
@@ -21,14 +22,18 @@ class ThreadedSender:
     def run(self):
         global router
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        address_tuple = router.get_next_hop(self.l3_data.destination.hex())
-        global unconfirmed_message_queue
+
+        if self.broadcast_address == None:
+            address_tuple = router.get_next_hop(self.l3_data.destination.hex())
+        else:
+            address_tuple = (BROADCAST_ADDRESS, self.broadcast_address)
 
         if address_tuple is not None:
             ip_address = address_tuple[1]
             s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
             try:
                 s.sendall(bytes(self.l3_data))
+                global unconfirmed_message_queue
                 unconfirmed_message_queue[self.l3_data.packet_number] = self.l3_data  # TODO: Redundant, store ID only.
             except Exception as e:
                 print('Exception sending packet...', e)
@@ -112,7 +117,13 @@ class StreamManager:
             # print(chunk, ' ', stream_id, ' ', chunk_id, ' ', stop_bit)
 
             chunk_id += 1
-            ThreadedSender(l3_packet)
+
+            if l3_packet.destination.hex() != BROADCAST_ADDRESS:
+                ThreadedSender(l3_packet)
+            else:
+                for node in router.neighbors:
+                    ThreadedSender(l3_packet, node[1])
+                    l3_packet.packet_number = get_next_packet_number()
 
 
 # Assembles single stream from incoming packets.
@@ -146,8 +157,6 @@ class PacketAccumulator:
         if l4_data.status == 1:
             self.finished = True
             self.finished_time = datetime.now()
-
-        # todo: use the key that should be used!
 
         if l5_data.type.encode() == L5_MESSAGE:
             self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
@@ -224,15 +233,20 @@ class MessageAggregator:
         try:
             if l3_data.type == L3_CONFIRMATION:
                 global unconfirmed_message_queue
-                del unconfirmed_message_queue[l3_data.confirmation_id]
-                # Debug
-                print("Confirmed by receiver ", l3_data.confirmation_id)
+                if l3_data.confirmation_id in unconfirmed_message_queue:
+                    del unconfirmed_message_queue[l3_data.confirmation_id]
+                    # Debug
+                    # print("Confirmed by receiver ", l3_data.confirmation_id)
+                else:
+                    # Debug
+                    # print("Confirming already ACKed packet: ", l3_data.confirmation_id)
+                    pass
                 return
             
             stream_id = l3_data.payload.stream_id
             self.insert(stream_id, packet)
         except Exception as e:
-            print("Failed to feed a packet:", e)
+            print("Failed to feed a packet:", e, "is already ACKed")
 
     def insert(self, stream, packet):
         for accumulator in self.accumulators:
