@@ -115,6 +115,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.createkey != "create" and args.name != "name":
+        if not os.path.exists('./keys'):
+            os.makedirs('./keys')
+
         source_address = args.createkey
         print('Source address:', source_address)
         sk, pk = create_pgpkey(args.name, source_address)
