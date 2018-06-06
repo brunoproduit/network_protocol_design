@@ -7,9 +7,13 @@ Chat program for the network protocol design course
 ## Setup
 To start the UI, use:
 
-`pip install pgpy`
+use any linux distro as System (pgpy doesn't work on Windows)
 
-`python3 interface.py`
+`apt-get install python3-pip`
+
+`pip3 install pgpy`
+
+`python3 main.py`
 
 
 The user will be prompted with the setup dialog:
@@ -23,13 +27,13 @@ Next, the user will be asked for the path to their own key:
 
 `Insert path for the own_node_key: 'your_key_path'`
 
-Next the User will be asked for its neighbors:
+In order to set neighbors edit the file neighbors.ini
+Keys are the md5 value of the neighbor, values are corresponding IP addresses
 
-`Add your neighbors: IP:'neighbor IP', mail:'neighbor mail'`
-
-After these three steps the user can start using the chat by using the following commands:
+67c91edbbb46ce9f7bca0b68feece836=127.0.0.1
 
 ```
+ md5 mailaddress - will give you the md5 value of an address
  @mail[:file] - Message with spaces.
  @all[:file] - Message with spaces to everyone.
  help - Display help.

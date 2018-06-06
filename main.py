@@ -18,7 +18,6 @@ class UserInterface:
         self.stream_mgr = StreamManager(pk)
 
     def __del__(self):
-        self.routinglistener.quit = True # file that tells if its readable
         print("cya next time!!")
 
     def enable_history(self):
