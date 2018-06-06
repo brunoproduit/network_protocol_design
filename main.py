@@ -129,8 +129,8 @@ if __name__ == '__main__':
 
     else:
         print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
-        sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')
-        pk = read_key_from_file(MASTERPREFIX + 'pubkey.pem')
+        sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')[0]
+        pk = read_key_from_file(MASTERPREFIX + 'pubkey.pem')[0]
         print('done reading keys..')
 
 

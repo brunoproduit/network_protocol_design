@@ -147,6 +147,8 @@ class PacketAccumulator:
             self.finished = True
             self.finished_time = datetime.now()
 
+        # todo: use the key that should be used!
+
         if l5_data.type.encode() == L5_MESSAGE:
             self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
             # Debug
@@ -224,13 +226,13 @@ class MessageAggregator:
                 global unconfirmed_message_queue
                 del unconfirmed_message_queue[l3_data.confirmation_id]
                 # Debug
-                # print("Confirmed by receiver ", l3_data.confirmation_id)
+                print("Confirmed by receiver ", l3_data.confirmation_id)
                 return
             
             stream_id = l3_data.payload.stream_id
             self.insert(stream_id, packet)
         except Exception as e:
-            print("Failed to feed a packet", e)
+            print("Failed to feed a packet:", e)
 
     def insert(self, stream, packet):
         for accumulator in self.accumulators:
