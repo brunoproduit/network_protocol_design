@@ -114,12 +114,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    global source_address
     if args.createkey != "create" and args.name != "name":
         if not os.path.exists('./keys'):
             os.makedirs('./keys')
 
         source_address = args.createkey
-        print('Source address:', source_address)
         sk, pk = create_pgpkey(args.name, source_address)
         write_key_to_file(sk, pk, MASTERPREFIX)
 
@@ -131,7 +131,10 @@ if __name__ == '__main__':
         print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
         sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')[0]
         pk = read_key_from_file(MASTERPREFIX + 'pubkey.pem')[0]
+        source_address = get_email_from_key(sk)
         print('done reading keys..')
+
+    print('your source address is:', source_address)
 
 
     utils = Utils()
