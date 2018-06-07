@@ -13,24 +13,21 @@ use any linux distro as System (pgpy doesn't work on Windows)
 
 `pip3 install pgpy`
 
-`python3 main.py`
+`python3 main.py -c -n [name] -s [address]`
 
+```
+-c is used to create new PGPkeys
+-n [name] is required with -c. The name is used to save the key pair.
+-s [address] defines the source address for this node.
+```
 
-The user will be prompted with the setup dialog:
+Neighbors can be set by editing the `neighbors.ini` file.
 
-First, the user will be asked to provide the location of the master key used to sign PGP keys:
-
-`Insert path for the master_key: 'master_key_path'`
-
-
-Next, the user will be asked for the path to their own key:
-
-`Insert path for the own_node_key: 'your_key_path'`
-
-In order to set neighbors edit the file neighbors.ini
 Keys are the md5 value of the neighbor, values are corresponding IP addresses
 
-67c91edbbb46ce9f7bca0b68feece836=127.0.0.1
+`67c91edbbb46ce9f7bca0b68feece836=127.0.0.1`
+
+Once the chat is running, the user will be able to use the following commands:
 
 ```
  md5 mailaddress - will give you the md5 value of an address
@@ -40,12 +37,13 @@ Keys are the md5 value of the neighbor, values are corresponding IP addresses
  quit - Exit the program
 ```
 
+For example, to send a "Hello!" message to "someone@ttu.ee", use:
+
+`@someone@ttu.ee Hello!`
 
 An example of the setup process and the `help` command can be seen here:
-![UI](https://github.com/brunoproduit/network_protocol_design/blob/master/ui.PNG)
+![UI](https://github.com/brunoproduit/network_protocol_design/blob/master/new_ui.PNG)
 
-If the user has previously done the setup process, they can choose to overwrite the settings defined in the previous setup:
-![overwrite](https://github.com/brunoproduit/network_protocol_design/blob/master/overwrite.PNG)
 
 ## Code hierarchy
 .
