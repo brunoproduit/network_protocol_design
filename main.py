@@ -130,7 +130,7 @@ if __name__ == '__main__':
         exit(1)
 
     else:
-        if os.path.isfile('privkey.pem'):
+        if os.path.isfile(MASTERPREFIX + 'privkey.pem'):
             print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
             sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')
             pk = read_key_from_file(MASTERPREFIX + 'privkey.pem').pubkey
