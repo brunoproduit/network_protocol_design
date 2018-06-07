@@ -49,6 +49,7 @@ If the user has previously done the setup process, they can choose to overwrite 
 
 ## Code hierarchy
 .
+
 ├── backgroundprocesses.py      -> 
 
 ├── constants.py                -> Contains the constant values
