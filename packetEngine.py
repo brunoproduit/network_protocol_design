@@ -60,15 +60,13 @@ class ThreadedSender:
 # Outgoing stream manager.
 class StreamManager:
     def __init__(self, pk):
-        # self.dividers = []  # TODO: Add control of the operations here.
-        # self.occupied_ids = []
         self.pk = pk
         self.current_id = 0
     
     def get_next_stream_id(self):
         self.current_id += 1
-        # TODO: restart loop
-        # TODO: mark unoccupied when freed
+        if self.current_id == 2147483647:
+            self.current_id = 0
         return self.current_id
 
     def add_stream(self, source, destination, data, is_file=False, file_name=""):
@@ -103,7 +101,7 @@ class StreamManager:
                     L4_DATA, 
                     True,
                     True, 
-                    1 if stop_bit else 0, #  TODO: Check status format in spec.
+                    1 if stop_bit else 0, 
                     stream_id, 
                     chunk_id),
                 bytes.fromhex(source_address),
@@ -204,7 +202,7 @@ class PacketAccumulator:
                 combined_data += value
 
             if not self.is_file:
-                print(self.sender, ": ", combined_data)  # TODO: Print sender.
+                print(self.sender, ": ", combined_data)
             else:
                 file_name = combined_data[0:combined_data.find('\00')]
                 print(self.sender, " sent file '", file_name, "'")
