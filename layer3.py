@@ -33,8 +33,8 @@ class Layer3:
         if packet[3] == L3_DATA:
             return Layer3(
                 packet_type=L3_DATA,
-                source=packet[8:24].hex(),
-                destination=packet[24:40].hex(),
+                source=packet[8:24],
+                destination=packet[24:40],
                 ttl=packet[4],
                 packet=int.from_bytes(packet[1:3], byteorder='big'),
                 data=Layer4.parse_l4(packet[40:]),
@@ -42,8 +42,8 @@ class Layer3:
         elif packet[3] == L3_CONFIRMATION:
             return Layer3(
                 packet_type=L3_CONFIRMATION,
-                source=packet[8:24].hex(),
-                destination=packet[24:40].hex(),
+                source=packet[8:24],
+                destination=packet[24:40],
                 ttl=packet[4],
                 confirmation=int.from_bytes(packet[5:7], byteorder='big')
             )

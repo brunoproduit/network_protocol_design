@@ -9,10 +9,10 @@ class Layer4:
     def __init__(self, data, packet_type, encrypted=True, chunked=True, status=0, stream_id=0, chunk_id=0):
         self.type = packet_type
 
-        if encrypted:
+        if encrypted and packet_type != L4_ROUTINGFULL:
             self.type = self.type ^ L4_ENCRYPTED
 
-        if chunked:
+        if chunked and packet_type != L4_ROUTINGFULL:
             self.type = self.type ^ L4_CHUNKED
 
         self.status = status
@@ -26,14 +26,10 @@ class Layer4:
                 chr(self.type) +
                 chr(self.status) +
                 Utils.int_to_bytestring(self.stream_id, 3) +
-                Utils.int_to_bytestring(self.chunk_id, 8) +
-                (bytes(self.payload)).decode()
-            ).encode()
+                Utils.int_to_bytestring(self.chunk_id, 8)
+            ).encode() + bytes(self.payload)
         elif self.type & L4_ROUTINGFULL:
-            return (
-                chr(self.type) +
-                (bytes(self.payload)).decode()
-            ).encode()
+            return chr(self.type).encode() + bytes(self.payload)
         else:
             raise ValueError('Layer 4 unsupported packet!')
 
@@ -42,7 +38,7 @@ class Layer4:
         if packet[0] & L4_DATA:
             return Layer4(
                 packet_type=L4_DATA,
-                data=Layer5.parse_l5((packet[13:]).decode()),
+                data=Layer5.parse_l5(packet[13:]),
                 encrypted=packet[0] & L4_ENCRYPTED,
                 chunked=packet[0] & L4_CHUNKED,
                 status=packet[1],

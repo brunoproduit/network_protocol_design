@@ -202,10 +202,10 @@ class PacketAccumulator:
                 combined_data += value
 
             if not self.is_file:
-                print(self.sender, ": ", combined_data)
+                print(self.sender.hex(), ": ", combined_data)
             else:
                 file_name = combined_data[0:combined_data.find('\00')]
-                print(self.sender, " sent file '", file_name, "'")
+                print(self.sender.hex(), " sent file '", file_name, "'")
                 Utils.write_file(file_name, '.', decrypt(combined_data[combined_data.find('\00')+1:], self.sk).encode())
             return MSG_READY
         return MSG_NOTREADY

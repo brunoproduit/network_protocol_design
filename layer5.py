@@ -21,4 +21,4 @@ class Layer5:
     # @return: l5p Layer5
     @staticmethod
     def parse_l5(packet):
-        return Layer5(packet[1:], packet[0])
+        return Layer5(packet[1:], bytes(packet[0]))
