@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Libraries
-import os
+import os, sys
 import readline
 from argparse import ArgumentParser
 
@@ -130,12 +130,16 @@ if __name__ == '__main__':
         exit(1)
 
     else:
-        print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
-        sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')[0]
-        pk = read_key_from_file(MASTERPREFIX + 'pubkey.pem')[0]
-        source_address = get_email_from_key(sk)
-        print('done reading keys..')
-
+        if os.path.isfile(MASTERPREFIX + 'privkey.pem'):
+            print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
+            sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')
+            pk = read_key_from_file(MASTERPREFIX + 'privkey.pem').pubkey
+            source_address = get_email_from_key(sk)
+            print('done reading keys..')
+        else:
+            print("privkey.pem doesn't exist in the PATH, use args to create key, or do it manually")
+            sys.exit(1)
+        
     if args.sourceaddr != 'empty':
         source_address = args.sourceaddr
 
