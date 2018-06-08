@@ -8,7 +8,7 @@ NAME = 'Network protocol design chat '                                          
 AUTHOR = 'Sander Mikelsaar, Sasan Reyaeifars, Florian Reiter, Bruno Produit, Pavel Chikul'    # Author of program
 VERSION = '1.0'                                                                               # Version of program
 DEVELOPMENT = True
-DEBUG = False
+DEBUG = True
 
 # UDP -----------------------------------------------------------------------------
 PORT = 1338                             # Default UDP port, can be changed in arg
@@ -48,9 +48,9 @@ INVALID_COMMAND = "invalid"
 MD5_COMMAND = "md5"
 
 # L5 ------------------------------------------------------------------------
-L5_MESSAGE = b'\x01'
-L5_FILE = b'\x02'
-L5_HASH = b'\x04'
+L5_MESSAGE = 1
+L5_FILE = 2
+L5_HASH = 4
 
 # L4 ------------------------------------------------------------------------
 L4_ROUTINGFULL = 1

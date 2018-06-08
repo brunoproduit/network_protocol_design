@@ -13,7 +13,7 @@ class Layer5:
     # Serializing the packet to be called as bytes(l5p)
     # @return: packet bytes
     def __bytes__(self):
-        return self.type + self.payload
+        return chr(self.type).encode() + self.payload
     
     # Parses a serialized l5 packet
     # @static
@@ -21,4 +21,4 @@ class Layer5:
     # @return: l5p Layer5
     @staticmethod
     def parse_l5(packet):
-        return Layer5(packet[1:], bytes(packet[0]))
+        return Layer5(packet[1:], packet[0])

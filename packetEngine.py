@@ -96,7 +96,7 @@ class StreamManager:
             l3_packet = Layer3(
                 Layer4(
                     Layer5(
-                        encrypt(chunk, self.pk).encode(),
+                        encrypt(chunk, self.pk),
                         L5_MESSAGE if not is_file else L5_FILE),
                     L4_DATA, 
                     True,
@@ -144,7 +144,7 @@ class PacketAccumulator:
         if self.stream_id == 0:
             self.stream_id = l4_data.stream_id
             self.sender = l3_data.source
-            self.is_file = False if l5_data.type.encode() == L5_MESSAGE else True
+            self.is_file = False if l5_data.type == L5_MESSAGE else True
         elif self.stream_id != l4_data.stream_id:
             print("Wrong stream ID!")
             return
@@ -153,11 +153,10 @@ class PacketAccumulator:
             self.finished = True
             self.finished_time = datetime.now()
 
-        if l5_data.type.encode() == L5_MESSAGE:
-            self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
-            # Utils.dbg_log(["MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
-        elif l5_data.type.encode() == L5_FILE:
-            self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
+        self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
+        if l5_data.type == L5_MESSAGE:
+            Utils.dbg_log(["MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
+        elif l5_data.type == L5_FILE:
             Utils.dbg_log(["FilePart ", l3_data.source, 
                 " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, " packet ",
                 l3_data.packet_number, ")"])
@@ -167,8 +166,8 @@ class PacketAccumulator:
         # Send ACK.
         ack_message = Layer3(
             Layer4(Layer5(b''), L4_DATA),
-            bytes.fromhex(l3_data.destination),
-            bytes.fromhex(l3_data.source),
+            l3_data.destination,
+            l3_data.source,
             get_next_packet_number(),
             15, 
             L3_CONFIRMATION, 
