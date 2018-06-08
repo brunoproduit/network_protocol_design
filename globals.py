@@ -11,22 +11,22 @@ router = Router(source_address, neighbors)
 packet_number_counter = 1024
 
 global unconfirmed_message_queue
-unconfirmed_message_queue = {}
+unconfirmed_message_queue = set([])
 
 lock = Lock()
 
 # Thread-safe add to unconfirmed queue.
-def add_unconfimed_message(l3_message):
+def add_unconfimed_message(id):
     global unconfirmed_message_queue
     lock.acquire()
-    unconfirmed_message_queue[l3_message.packet_number] = l3_message  # TODO: Data is redundant, store ID only.
+    unconfirmed_message_queue.add(id)
     lock.release()
 
-# Thread-safe delete from unconfirmed queue.
+# Thread-safe delete from unconfirmed queue if present.
 def del_unconfimed_message(id):
     global unconfirmed_message_queue
     lock.acquire()
-    del unconfirmed_message_queue[id]
+    unconfirmed_message_queue.discard(id)
     lock.release()
 
 # Thread-safe item check in unconfirmed queue.

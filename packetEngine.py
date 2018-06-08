@@ -34,7 +34,7 @@ class ThreadedSender:
             s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
             try:
                 s.sendall(bytes(self.l3_data))
-                add_unconfimed_message(self.l3_data)
+                add_unconfimed_message(self.l3_data.packet_number)
             except Exception as e:
                 print('Exception sending packet...', e)
         else:
