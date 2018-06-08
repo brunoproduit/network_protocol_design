@@ -61,14 +61,14 @@ def create_pgp_message_from_file(filename):
 # @param: pk PGPkey.pubkey
 # @return: pgp_m string
 def encrypt(m, pk):
-    return str(pk.encrypt(create_pgp_message(m)))
+    return bytes(pk.encrypt(create_pgp_message(m)))
 
 # Encrypt file
 # @param: filename string
 # @param: pk PGPkey.pubkey
 # @return: pgp_m string
 def encrypt_file(filename, pk):
-    return str(pk.encrypt(create_pgp_message_from_file(filename)))
+    return bytes(pk.encrypt(create_pgp_message_from_file(filename)))
 
 # Decrypt string
 # @param: c string
@@ -124,12 +124,18 @@ def unitTest():
     assert ("Hello World!" == decrypt(encrypt("Hello World!", pk), sk))
     
     # Write key to file test
-    write_key_to_file(sk, pk)
+    write_key_to_file(sk, pk, "test")
     
     # File encryption test
     enc_file = encrypt_file("ui.PNG", pk)
-    open("enc_ui", "w").write(enc_file)
+    open("enc_ui", "wb").write(enc_file)
     dec_file = decrypt_file("enc_ui", sk)
     open("dec_ui.PNG", "wb").write(dec_file)
+
+    # msg bytes
+    msg = create_pgp_message("Hello World!")
+    print(bytes(msg))
+    enc_msg = encrypt("Hello World!", pk)
+    print(enc_msg)
 
 #unitTest()

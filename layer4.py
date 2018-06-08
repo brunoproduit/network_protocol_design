@@ -27,7 +27,7 @@ class Layer4:
                 chr(self.status) +
                 Utils.int_to_bytestring(self.stream_id, 3) +
                 Utils.int_to_bytestring(self.chunk_id, 8) +
-                (bytes(self.payload)).decode()
+                (bytes(self.payload))
             ).encode()
         elif self.type & L4_ROUTINGFULL:
             return (

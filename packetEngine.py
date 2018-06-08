@@ -33,8 +33,10 @@ class ThreadedSender:
             ip_address = address_tuple[1]
             s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
             try:
-                s.sendall(bytes(self.l3_data))
+                print(self.l3_data.payload.__bytes__())
+                s.sendall(self.l3_data.__bytes__())
                 add_unconfimed_message(self.l3_data)
+
             except Exception as e:
                 print('Exception sending packet...', e)
         else:
@@ -74,6 +76,8 @@ class StreamManager:
     def add_stream(self, source, destination, data, is_file=False, file_name=""):
         if is_file:
             data = file_name + '\00' + encrypt_file(data, self.pk)
+        else:
+            data = encrypt(data, self.pk)
 
         size = len(data)
         index = 0
@@ -98,7 +102,7 @@ class StreamManager:
             l3_packet = Layer3(
                 Layer4(
                     Layer5(
-                        encrypt(chunk, self.pk).encode(),
+                        chunk,
                         L5_MESSAGE if not is_file else L5_FILE),
                     L4_DATA, 
                     True,
