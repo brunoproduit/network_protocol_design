@@ -48,36 +48,36 @@ An example of the setup process and the `help` command can be seen here:
 ## Code hierarchy
 .
 
-├── backgroundprocesses.py      -> 
+├── backgroundprocesses.py      -> Launches a listener thread to collect incoming messages.
 
-├── constants.py                -> Contains the constant values
+├── constants.py                -> Contains the constant values.
 
-├── crypto.py                   -> Does all the crypto stuff, is imported in main
+├── crypto.py                   -> Does all the crypto stuff, is imported in main.
 
-├── globals.py                  -> Helper file containing global variables
+├── globals.py                  -> Helper file containing global variables.
 
-├── layer3.py                   -> Layer 3 object, encapsulates l4
+├── layer3.py                   -> Layer 3 object, encapsulates l4.
 
-├── layer4.py                   -> Layer 4 object, encapsulates l5
+├── layer4.py                   -> Layer 4 object, encapsulates l5.
 
-├── layer5.py                   -> Layer 5 object, encapsulates raw data or file
+├── layer5.py                   -> Layer 5 object, encapsulates raw data or file.
 
-├── LICENSE                     -> license
+├── LICENSE                     -> license.
 
-├── main.py                     -> Main entry of the program
+├── main.py                     -> Main entry of the program.
 
-├── modules_install.txt         -> Can be used for pip
+├── modules_install.txt         -> Can be used for pip.
 
-├── neighbors_template.ini      -> template for the .ini file used for neighbors
+├── neighbors_template.ini      -> template for the .ini file used for neighbors.
 
-├── packetEngine.py             -> Used for chunking and pa
+├── packetEngine.py             -> Provides classes to split and reconstruct data upon send/receive.
 
-├── README.md                   -> This readme
+├── README.md                   -> This readme.
 
-├── routing.py                  -> Router object to be used for the routing process (bellman ford)
+├── routing.py                  -> Router object to be used for the routing process (bellman ford).
 
-├── routing_table.py            -> Keeps the routing table
+├── routing_table.py            -> Keeps the routing table.
 
-└── utils.py                    -> Some utilities for all files
+└── utils.py                    -> Some utilities for all files.
 
 
