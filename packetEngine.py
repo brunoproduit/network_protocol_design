@@ -71,7 +71,7 @@ class StreamManager:
 
     def add_stream(self, source, destination, data, is_file=False, file_name=""):
         if is_file:
-            data = file_name + '\00' + encrypt_file(data, self.pk)
+            data = file_name.encode() + b'\00' + data
 
         size = len(data)
         index = 0
@@ -153,10 +153,10 @@ class PacketAccumulator:
             self.finished = True
             self.finished_time = datetime.now()
 
-        self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk)
+        self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk, l5_data.type == L5_FILE)
         if l5_data.type == L5_MESSAGE:
             Utils.dbg_log(["MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
-        elif l5_data.type == L5_FILE:
+        elif l5_data.type == L5_FILE:   
             Utils.dbg_log(["FilePart ", l3_data.source, 
                 " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, " packet ",
                 l3_data.packet_number, ")"])
@@ -188,7 +188,7 @@ class PacketAccumulator:
     def check(self):
         if self.finished:             
             # Check integrity
-            combined_data = '' # TODO: File also!
+            combined_data = b'' # TODO: File also!
             start_id = -1
             for key, value in sorted(self.data.items()):
                 if key - start_id != 1:
@@ -203,9 +203,9 @@ class PacketAccumulator:
             if not self.is_file:
                 print(self.sender.hex(), ": ", combined_data)
             else:
-                file_name = combined_data[0:combined_data.find('\00')]
+                file_name = str(combined_data[0:combined_data.find(b'\00')])
                 print(self.sender.hex(), " sent file '", file_name, "'")
-                Utils.write_file(file_name, '.', decrypt(combined_data[combined_data.find('\00')+1:], self.sk).encode())
+                Utils.write_file(file_name, '.', combined_data[combined_data.find(b'\00')+1:])
             return MSG_READY
         return MSG_NOTREADY
 
