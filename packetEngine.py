@@ -155,9 +155,9 @@ class PacketAccumulator:
 
         self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk, l5_data.type == L5_FILE)
         if l5_data.type == L5_MESSAGE:
-            Utils.dbg_log(["MsgPart ", l3_data.source, ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
+            Utils.dbg_log(["MsgPart ", l3_data.source.hex(), ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
         elif l5_data.type == L5_FILE:   
-            Utils.dbg_log(["FilePart ", l3_data.source, 
+            Utils.dbg_log(["FilePart ", l3_data.source.hex(), 
                 " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, " packet ",
                 l3_data.packet_number, ")"])
         else:
@@ -198,12 +198,12 @@ class PacketAccumulator:
                     #    print("Packet receving timed out...")
                     #    return MSG_TIMEOUT
                 
-                combined_data += value
+                combined_data += value if type(value) is not str else value.encode()
 
             if not self.is_file:
-                print(self.sender.hex(), ": ", combined_data)
+                print(self.sender.hex(), ": ", combined_data.decode())
             else:
-                file_name = str(combined_data[0:combined_data.find(b'\00')])
+                file_name = combined_data[0:combined_data.find(b'\00')].decode()
                 print(self.sender.hex(), " sent file '", file_name, "'")
                 Utils.write_file(file_name, '.', combined_data[combined_data.find(b'\00')+1:])
             return MSG_READY
