@@ -38,6 +38,7 @@ DETAIL_SEPERATOR = ":"
 SEND_FILE_COMMAND = "file"
 SEND_MESSAGE_COMMAND = "message"
 QUIT_COMMAND = "quit"
+LIST_COMMAND = "list"
 HELP_COMMAND = "help"
 HELP_TEXT = "The following commands are valid:\n @mail[:file] - Message with spaces. (e.g.\
 @maxmu@ttu.ee:file secret.doc, @mimmu@ttu.ee Hello World!)\n @all[:file] - Message with spaces to\

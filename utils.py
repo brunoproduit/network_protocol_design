@@ -8,6 +8,7 @@ class Utils:
     # Helper function to read a file returns a binary string
     # @param:filename string
     # @return: binary string
+    @staticmethod
     def read_file(filename):
          if os.path.exists(filename):
              f = open(filename, 'rb')
@@ -37,6 +38,7 @@ class Utils:
     # @param:directory string
     # @param:data binary string
     # @param:overwrite boolean
+    @staticmethod
     def write_file(filename, directory, data, overwrite = False):
         if os.path.exists(directory+ "/" + filename) and not overwrite:
             print('File already exist, choosing random name...')

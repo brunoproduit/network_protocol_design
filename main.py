@@ -10,6 +10,7 @@ from argparse import ArgumentParser
 from backgroundprocesses import *
 from packetEngine import StreamManager
 from utils import *
+from globals import router
 
 class UserInterface:
     def __init__(self):
@@ -40,7 +41,9 @@ class UserInterface:
         self.routinglistener.start()  # router is listening now
         self.messagelistener.start()  # also messages will be displayed now!
 
-        # do the routing startup / start the routing update routine for every 30 seconds!
+        global router
+        self.stream_mgr.send_routing_update(source_address, router.neighbors)
+        # __ do the routing startup / start the routing update routine for every 30 seconds!
 
     # main loop routine with command recognition an respond
     def main_loop(self):
@@ -90,6 +93,10 @@ class UserInterface:
 
                 self.stream_mgr.add_stream(source_address, destination_address, payload)
                 return 0
+
+        elif input == LIST_COMMAND:
+            global router
+            router.list_members()
 
         elif input == QUIT_COMMAND:
             print ('Exiting...')

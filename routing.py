@@ -60,6 +60,10 @@ class Router:
                         return row
             prev_step = next_step
 
+    def list_members(self):
+        for key, value in self.neighbors:
+            print(key, ":", value)
+
 
 # Graph class which represents the acyclic graph used to calculate bellman-ford
 class Graph:

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
-from routing import *
+from routing import Router
 from crypto import md5_hash
+from utils import Utils
 
 class RoutingTable:
     def __init__(self, table={}):
@@ -9,7 +10,7 @@ class RoutingTable:
     def __bytes__(self):
         result = bytes(0)
         for key, value in self.table.items():
-            result = result + key + bytes([value]) 
+            result = result + bytearray.fromhex(key) + b'\x01' # __
         return result
 
     @staticmethod
@@ -20,7 +21,7 @@ class RoutingTable:
         result = RoutingTable()
         i = 0
         while i < len(data):
-            result.table[data[i : i+16]] = data[i+16]
+            result.table[Utils.hex_decode(data[i : i+16])] = data[i+16]
             i += 17
         return result
 

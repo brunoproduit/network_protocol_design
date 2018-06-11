@@ -11,11 +11,35 @@ import threading
 import socket
 
 
+def send_ack(source, destination, packet_number):
+    ack_message = Layer3(
+        Layer4(Layer5(b''), L4_DATA),
+        source,
+        destination,
+        get_next_packet_number(),
+        15, 
+        L3_CONFIRMATION, 
+        packet_number)
+
+    global router
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    address_tuple = router.get_next_hop(ack_message.destination.hex())
+
+    if address_tuple is not None:
+        ip_address = address_tuple[1]
+        s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
+        try:
+            s.sendall(bytes(ack_message))
+        except Exception as e:
+            print('Exception sending ACK packet...', e)
+
+
 # Sends a packet and awaits for the ACK. Resends if no ACK.
 class ThreadedSender:
-    def __init__(self, l3_data, broadcast_address = None):
+    def __init__(self, l3_data, broadcast_address = None, need_ack=True):
         self.l3_data = l3_data
         self.broadcast_address = broadcast_address
+        self.need_ack = need_ack
         thread = threading.Thread(target=self.run, args=())
         thread.daemon = True
         thread.start()
@@ -41,21 +65,22 @@ class ThreadedSender:
             print(self.l3_data.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
             return
 
-        tries = 0
-        while tries < SEND_RETRIES:
-            time.sleep(ACK_TIMEOUT)
-            if is_unconfimed_message(self.l3_data.packet_number):
-                Utils.dbg_log(["Packet unconfirmed ", self.l3_data.packet_number, ", re-send!"])
-                tries += 1
-                try:
-                    s.sendall(bytes(self.l3_data))
-                except Exception as e:
-                    print('Exception re-sending packet...', e)
-            else:
-                Utils.dbg_log(["Confirmation received by sender ", self.l3_data.packet_number])
-                return
-        
-        print("Error: Packet not delivered", self.l3_data.packet_number)
+        if self.need_ack:
+            tries = 0
+            while tries < SEND_RETRIES:
+                time.sleep(ACK_TIMEOUT)
+                if is_unconfimed_message(self.l3_data.packet_number):
+                    Utils.dbg_log(["Packet unconfirmed ", self.l3_data.packet_number, ", re-send!"])
+                    tries += 1
+                    try:
+                        s.sendall(bytes(self.l3_data))
+                    except Exception as e:
+                        print('Exception re-sending packet...', e)
+                else:
+                    Utils.dbg_log(["Confirmation received by sender ", self.l3_data.packet_number])
+                    return
+            
+            print("Error: Packet not delivered", self.l3_data.packet_number)
 
 # Outgoing stream manager.
 class StreamManager:
@@ -68,6 +93,24 @@ class StreamManager:
         if self.current_id == 2147483647:
             self.current_id = 0
         return self.current_id
+
+    def send_routing_update(self, source, neighbors):
+        source_address = Utils.address_to_md5(source)
+        try:
+            l3_packet = Layer3(
+                Layer4(
+                    bytes(RoutingTable(dict(neighbors))),
+                    L4_ROUTINGFULL),
+                bytes.fromhex(source_address),
+                bytes.fromhex(BROADCAST_ADDRESS),
+                get_next_packet_number(),
+                packet_type=L3_DATA)
+
+            for node in neighbors:
+                ThreadedSender(l3_packet, node[1])  # __ Probably switch off ACK for routing.
+                l3_packet.packet_number = get_next_packet_number()
+        except Exception as e:
+            print("Error sending routing update", e)
 
     def add_stream(self, source, destination, data, is_file=False, file_name=""):
         if is_file:
@@ -163,32 +206,12 @@ class PacketAccumulator:
         else:
             print("Invalid packet type")
 
-        # Send ACK.
-        ack_message = Layer3(
-            Layer4(Layer5(b''), L4_DATA),
-            l3_data.destination,
-            l3_data.source,
-            get_next_packet_number(),
-            15, 
-            L3_CONFIRMATION, 
-            l3_data.packet_number)
-
-        global router
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        address_tuple = router.get_next_hop(ack_message.destination.hex())
-
-        if address_tuple is not None:
-            ip_address = address_tuple[1]
-            s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
-            try:
-                s.sendall(bytes(ack_message))
-            except Exception as e:
-                print('Exception sending ACK packet...', e)
+        send_ack(l3_data.destination, l3_data.source, l3_data.packet_number)
 
     def check(self):
         if self.finished:             
             # Check integrity
-            combined_data = b'' # TODO: File also!
+            combined_data = b''
             start_id = -1
             for key, value in sorted(self.data.items()):
                 if key - start_id != 1:
@@ -232,6 +255,12 @@ class MessageAggregator:
                 else:
                     Utils.dbg_log(["Packet already confirmed ", l3_data.confirmation_id])
                     # pass
+                return
+            
+            l4_data = l3_data.payload
+            if l4_data.type & L4_ROUTINGFULL:
+                Utils.dbg_log(["Received routing data update from ", l3_data.source.hex()])
+                send_ack(l3_data.destination, l3_data.source, l3_data.packet_number)
                 return
             
             stream_id = l3_data.payload.stream_id
