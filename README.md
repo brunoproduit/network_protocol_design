@@ -62,13 +62,13 @@ An example of the setup process and the `help` command can be seen here:
 
 ├── layer5.py                   -> Layer 5 object, encapsulates raw data or file.
 
-├── LICENSE                     -> license.
+├── LICENSE                     -> License.
 
 ├── main.py                     -> Main entry of the program.
 
 ├── modules_install.txt         -> Can be used for pip.
 
-├── neighbors_template.ini      -> template for the .ini file used for neighbors.
+├── neighbors_template.ini      -> Template for the .ini file used for neighbors.
 
 ├── packetEngine.py             -> Provides classes to split and reconstruct data upon send/receive.
 
@@ -76,7 +76,7 @@ An example of the setup process and the `help` command can be seen here:
 
 ├── routing.py                  -> Router object to be used for the routing process (bellman ford).
 
-├── routing_table.py            -> Keeps the routing table.
+├── routing_table.py            -> Data storage and serialization class for the routing table.
 
 └── utils.py                    -> Some utilities for all files.
 
