@@ -233,7 +233,6 @@ class PacketAccumulator:
                     if datetime.now() > self.finished_time + timedelta(0, 20):
                         return MSG_NOTREADY
                     # else:
-                    #    Debug
                     #    print("Packet receving timed out...")
                     #    return MSG_TIMEOUT
                 
@@ -242,7 +241,12 @@ class PacketAccumulator:
             if not self.is_file:
                 print(self.sender.hex(), ": ", decrypt(combined_data, self.sk).decode())
             else:
-                raw_data = decrypt(combined_data, self.sk, True)
+                try:
+                    raw_data = decrypt(combined_data, self.sk, True)
+                except Exception as e:
+                    # print("Error decrypting file: ", combined_data)  # __
+                    return MSG_READY
+
                 file_name = raw_data[0:raw_data.find(b'\00')].decode()
                 print(self.sender.hex(), " sent file '", file_name, "'")
                 Utils.write_file(file_name, '.', raw_data[raw_data.find(b'\00')+1:])
@@ -264,26 +268,26 @@ class MessageAggregator:
             print(e)
             return
 
-        try:
-            if l3_data.type == L3_CONFIRMATION:
-                if is_unconfimed_message(l3_data.confirmation_id):
-                    del_unconfimed_message(l3_data.confirmation_id)
-                    Utils.dbg_log(["Confirmed by receiver ", l3_data.confirmation_id])
-                else:
-                    Utils.dbg_log(["Packet already confirmed ", l3_data.confirmation_id])
-                    # pass
-                return
-            
-            l4_data = l3_data.payload
-            if l4_data.type & L4_ROUTINGFULL:
-                Utils.dbg_log(["Received routing data update from ", l3_data.source.hex()])
-                send_ack(l3_data.destination, l3_data.source, l3_data.packet_number)
-                return
-            
-            stream_id = l3_data.payload.stream_id
-            self.insert(stream_id, packet)
-        except Exception as e:
-            print("Failed to feed a packet:", e)
+        #try:
+        if l3_data.type == L3_CONFIRMATION:
+            if is_unconfimed_message(l3_data.confirmation_id):
+                del_unconfimed_message(l3_data.confirmation_id)
+                Utils.dbg_log(["Confirmed by receiver ", l3_data.confirmation_id])
+            else:
+                Utils.dbg_log(["Packet already confirmed ", l3_data.confirmation_id])
+                # pass
+            return
+        
+        l4_data = l3_data.payload
+        if l4_data.type & L4_ROUTINGFULL:
+            Utils.dbg_log(["Received routing data update from ", l3_data.source.hex()])
+            send_ack(l3_data.destination, l3_data.source, l3_data.packet_number)
+            return
+        
+        stream_id = l3_data.payload.stream_id
+        self.insert(stream_id, packet)
+        #except Exception as e:
+        #    print("Failed to feed a packet:", e)
 
     def insert(self, stream, packet):
         for accumulator in self.accumulators:
