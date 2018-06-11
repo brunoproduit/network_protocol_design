@@ -13,24 +13,36 @@ use any linux distro as System (pgpy doesn't work on Windows)
 
 `pip3 install pgpy`
 
-`python3 main.py -c -n [name] -s [address]`
+First time running the program to create the pgp key (creates the /keys folder that all nodes are using!)
+
+`python3 main.py -c f@r.ee -n "Friedrich Richter"`
+
+If the keys are already set up the program can be started with
+
+`python3 main.py -s f@r.ee`
+
+For the other nodes (according to neighbors.ini-s):
+`python3 main.py -s m@m -p 8000 -N neighbors1.ini`
+`python3 main.py -s r@f -p 7000 -N neighbors2.ini`
+
 
 ```
 -c is used to create new PGPkeys
 -n [name] is required with -c. The name is used to save the key pair.
--s [address] defines the source address for this node.
+-s [address] defines the source address (email) for this node.
+-p [port] defines the source port for this node
 ```
 
 Neighbors can be set by editing the `neighbors.ini` file.
 
 Keys are the md5 value of the neighbor, values are corresponding IP addresses
 
-`67c91edbbb46ce9f7bca0b68feece836=127.0.0.1`
+`bcd5f9093d1136ce28850cf1b8bcd2b0=127.0.0.1:7000`
 
 Once the chat is running, the user will be able to use the following commands:
 
 ```
- md5 mailaddress - will give you the md5 value of an address
+ md5 mailaddress - will give you the md5 value of any address
  @mail[:file] - Message with spaces.
  @all[:file] - Message with spaces to everyone.
  help - Display help.

@@ -33,7 +33,7 @@ class UserInterface:
 
     # startup routine from user interface
     def startup(self):
-        print("Welcome to our uber-cool implementation of the NPD Protocol Stack")
+        print("Welcome to our implementation of the NPD Protocol Stack")
         self.display_seperator()
 
         self.routinglistener.setDaemon(True)  # router is listening now

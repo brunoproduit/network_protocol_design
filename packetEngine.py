@@ -73,7 +73,7 @@ class ThreadedSender:
             except Exception as e:
                 print('Exception sending packet...', e)
         else:
-            print(self.l3_data.destination.hex(), ', doesn\'t exist in the neighbors list, try another Mail!')
+            print(self.l3_data.destination.hex(), ', doesn\'t exist in the routing table, try another Mail!')
             return
 
         if self.need_ack:
@@ -191,6 +191,7 @@ class PacketAccumulator:
             l3_data = Layer3.parse_l3(raw_data)
             l4_data = l3_data.payload
             l5_data = l3_data.payload.payload
+            # here should be the forwarding part!
         except Exception as e:
             print("Error accumulating packet: " + str(e))
             return
@@ -229,6 +230,7 @@ class PacketAccumulator:
                     if datetime.now() > self.finished_time + timedelta(0, 20):
                         return MSG_NOTREADY
                     # else:
+                    #    Debug
                     #    print("Packet receving timed out...")
                     #    return MSG_TIMEOUT
                 
