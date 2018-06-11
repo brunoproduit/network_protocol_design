@@ -208,6 +208,9 @@ class PacketAccumulator:
             self.finished = True
             self.finished_time = datetime.now()
 
+        # if l4_data.type == L4_ROUTINGFULL:
+        #        do_routingtable_update(l3_data)
+
         self.data[l4_data.chunk_id] = l5_data.payload
         if l5_data.type == L5_MESSAGE:
             Utils.dbg_log(["MsgPart ", l3_data.source.hex(), ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ", size ", len(bytes(l3_data)), ")"])

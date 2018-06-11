@@ -15,7 +15,7 @@ class BackgroundListener(threading.Thread):
         threading.Thread.__init__(self)
         self.address = address
         self.port = port
-        self.sk = sk  # should be global as well I guess!
+        self.sk = sk
 
     def run(self):
 
