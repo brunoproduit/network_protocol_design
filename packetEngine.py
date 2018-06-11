@@ -116,6 +116,8 @@ class StreamManager:
         if is_file:
             data = file_name.encode() + b'\00' + data
 
+        data = encrypt(data, self.pk)
+
         size = len(data)
         index = 0
         chunk_id = 0
@@ -123,24 +125,22 @@ class StreamManager:
         
         while index < size:
             stop_bit = False
-            if index + MAX_PDU_SIZE <= size:
-                chunk = data[index:index + MAX_PDU_SIZE]
+            if index + MAX_PAYLOAD_SIZE <= size:
+                chunk = data[index:index + MAX_PAYLOAD_SIZE]
             else:
                 chunk = data[index:size]
 
-            if index + MAX_PDU_SIZE >= size:
+            if index + MAX_PAYLOAD_SIZE >= size:
                 stop_bit = True
 
-            index += MAX_PDU_SIZE
+            index += MAX_PAYLOAD_SIZE
 
             source_address = Utils.address_to_md5(source)
             destination_address = Utils.address_to_md5(destination)
 
             l3_packet = Layer3(
                 Layer4(
-                    Layer5(
-                        encrypt(chunk, self.pk),
-                        L5_MESSAGE if not is_file else L5_FILE),
+                    Layer5(chunk, L5_MESSAGE if not is_file else L5_FILE),
                     L4_DATA, 
                     True,
                     True, 
@@ -196,9 +196,9 @@ class PacketAccumulator:
             self.finished = True
             self.finished_time = datetime.now()
 
-        self.data[l4_data.chunk_id] = decrypt(l5_data.payload, self.sk, l5_data.type == L5_FILE)
+        self.data[l4_data.chunk_id] = l5_data.payload
         if l5_data.type == L5_MESSAGE:
-            Utils.dbg_log(["MsgPart ", l3_data.source.hex(), ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ")"])
+            Utils.dbg_log(["MsgPart ", l3_data.source.hex(), ': ', self.data[l4_data.chunk_id], " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, ", size ", len(bytes(l3_data)), ")"])
         elif l5_data.type == L5_FILE:   
             Utils.dbg_log(["FilePart ", l3_data.source.hex(), 
                 " (stream/chunk ", self.stream_id, "/", l4_data.chunk_id, " packet ",
@@ -224,11 +224,12 @@ class PacketAccumulator:
                 combined_data += value if type(value) is not str else value.encode()
 
             if not self.is_file:
-                print(self.sender.hex(), ": ", combined_data.decode())
+                print(self.sender.hex(), ": ", decrypt(combined_data, self.sk).decode())
             else:
-                file_name = combined_data[0:combined_data.find(b'\00')].decode()
+                raw_data = decrypt(combined_data, self.sk, True)
+                file_name = raw_data[0:raw_data.find(b'\00')].decode()
                 print(self.sender.hex(), " sent file '", file_name, "'")
-                Utils.write_file(file_name, '.', combined_data[combined_data.find(b'\00')+1:])
+                Utils.write_file(file_name, '.', raw_data[raw_data.find(b'\00')+1:])
             return MSG_READY
         return MSG_NOTREADY
 
