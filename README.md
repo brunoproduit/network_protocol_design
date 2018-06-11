@@ -22,8 +22,8 @@ If the keys are already set up the program can be started with
 `python3 main.py -s f@r.ee`
 
 For the other nodes (according to neighbors.ini-s):
-`python3 main.py -s m@m -p 8000 -N neighbors1.ini`
-`python3 main.py -s r@f -p 7000 -N neighbors2.ini`
+`python3 main.py -s m@m.ee -p 8000 -N neighbors1.ini`
+`python3 main.py -s r@f.ee -p 7000 -N neighbors2.ini`
 
 
 ```
