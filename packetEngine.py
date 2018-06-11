@@ -27,7 +27,13 @@ def send_ack(source, destination, packet_number):
 
     if address_tuple is not None:
         ip_address = address_tuple[1]
-        s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
+
+        ip = ip_address.split(':')
+        if len(ip) == 2:
+            s.connect((ip[0], int(ip[1])))
+        else:
+            s.connect((ip_address, PORT))
+
         try:
             s.sendall(bytes(ack_message))
         except Exception as e:
@@ -55,7 +61,12 @@ class ThreadedSender:
 
         if address_tuple is not None:
             ip_address = address_tuple[1]
-            s.connect((ip_address, PORT))  # PORT could also be used somewhere else!
+
+            ip = ip_address.split(':')
+            if len(ip) == 2:
+                s.connect((ip[0], int(ip[1])))
+            else:
+                s.connect((ip_address, PORT))
             try:
                 s.sendall(bytes(self.l3_data))
                 add_unconfimed_message(self.l3_data.packet_number)

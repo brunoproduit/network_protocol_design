@@ -120,6 +120,10 @@ if __name__ == '__main__':
                         nargs='?', default="name")
     parser.add_argument('-s', '--sourceaddr', help='Set the source address for this node',
                         nargs='?', default="empty")
+    parser.add_argument('-p', '--port', help='Set the source port for this node',
+                        nargs='?', default="1338")
+    parser.add_argument('-N', '--neighborsfile', help='Set the neighbors-file path for this node',
+                        nargs='?', default="1338")
 
     args = parser.parse_args()
 
@@ -139,16 +143,23 @@ if __name__ == '__main__':
     else:
         if os.path.isfile(MASTERPREFIX + 'privkey.pem'):
             print('Reading keys from ', MASTERPREFIX, '[priv|pub]key.pem, if this fails use the --createkey options to start!')
-            sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')
-            pk = read_key_from_file(MASTERPREFIX + 'privkey.pem').pubkey
+            sk = read_key_from_file(MASTERPREFIX + 'privkey.pem')[0]
+            pk = read_key_from_file(MASTERPREFIX + 'privkey.pem')[0].pubkey
             source_address = get_email_from_key(sk)
             print('done reading keys..')
         else:
-            print("privkey.pem doesn't exist in the PATH, use args to create key, or do it manually")
+            print("privkey.pem doesn't exist in the PATH, use --createkey and --name to create a key, or do it manually")
             sys.exit(1)
         
     if args.sourceaddr != 'empty':
         source_address = args.sourceaddr
+
+    if args.port != '1338':
+        PORT = int(args.port)
+        ROUTER_PORT = PORT + 1
+
+    if args.neighborsfile != 'neighbors.ini':
+        NEIGHBORSFILE = args.neighborsfile
 
     print('your source address is:', source_address)
 

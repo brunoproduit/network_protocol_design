@@ -8,7 +8,7 @@ NAME = 'Network protocol design chat '                                          
 AUTHOR = 'Sander Mikelsaar, Sasan Reyaeifars, Florian Reiter, Bruno Produit, Pavel Chikul'    # Author of program
 VERSION = '1.0'                                                                               # Version of program
 DEVELOPMENT = True
-DEBUG = False
+DEBUG = True
 
 # UDP -----------------------------------------------------------------------------
 PORT = 1338                             # Default UDP port, can be changed in arg
